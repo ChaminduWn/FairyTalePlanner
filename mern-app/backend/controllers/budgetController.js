@@ -1,5 +1,5 @@
 // Backend - Controller (budgetController.js)
-import PropertyService from "../models/PropertyService.js";
+import PropertyService from "../models/propertyService.model.js";
 
 export const getBudgetCombinations = async (req, res) => {
     try {
