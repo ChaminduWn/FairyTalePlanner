@@ -1,14 +1,16 @@
-import { Routes, Route } from "react-router-dom";
-import BudgetTracker from "./BudgetTracker.jsx";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import BudgetTracker from "./pages/BudgetTracker.jsx";
 
 function App() {
   return (
-    <div>
-      <h1>Wedding Budget Planning System</h1>
-      <Routes>
-        <Route path="/" element={<BudgetTracker />} />
-      </Routes>
-    </div> 
+    <Router>
+      <div>
+        <h1>Wedding Budget Planning System</h1>
+        <Routes>
+          <Route path="/" element={<BudgetTracker />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
