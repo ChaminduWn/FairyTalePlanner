@@ -1,12 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import BudgetRoutes from './routes/budgetRoutes.js';
 
-dotenv.config();   
-
-const app = express();
+dotenv.config(); 
+const app = express();  
+app.use(cors({ origin: "http://localhost:5174", credentials: true }));
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
@@ -20,7 +22,7 @@ mongoose
   }); 
 
 // Routes
-app.use("/api/budget", BudgetRoutes);
+app.use("/api", BudgetRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
