@@ -1,99 +1,210 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Button, Label, TextInput, Select, Checkbox, Spinner, Alert } from "flowbite-react";
 
-const districts = [
-  "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
-];
-
-const categories = ["Photography", "Bridal Service", "Photo Location", "Groom Dressing", "Car Rental", "Entertainment Services", "Invitation & Gift Services", "Private Villa"];
-
-const BudgetTracker = () => {
+const WeddingPackage = () => {
     const [budget, setBudget] = useState("");
-    const [location, setLocation] = useState("Colombo");
+    const [location, setLocation] = useState("");
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [results, setResults] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    // Handles category selection and deselection
+    const districts = [
+        "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle",
+        "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle",
+        "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala",
+        "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura",
+        "Trincomalee", "Vavuniya",
+    ];
+
+    const categories = [
+        "Photography", "Bridal Service", "Photo Location", "Groom Dressign",
+        "Car rental", "Entertainment Services", "Invitation & Gift Services",
+        "Private Villa",
+    ];
+
     const handleCategoryChange = (category) => {
-        setSelectedCategories((prevCategories) => {
-            if (prevCategories.includes(category)) {
-                return prevCategories.filter((cat) => cat !== category); // Remove category if already selected
-            } else {
-                return [...prevCategories, category]; // Add category if not selected
-            }
-        });
+        setSelectedCategories((prev) =>
+            prev.includes(category)
+                ? prev.filter((cat) => cat !== category)
+                : [...prev, category]
+        );
     };
 
-    const fetchOptions = async () => {
-        if (!budget || selectedCategories.length === 0) {
-            alert("Please provide a valid budget and select at least one category.");
+    const findCombinations = async (e) => {
+        e.preventDefault();
+
+        if (!budget || !location || selectedCategories.length === 0) {
+            setError("Please enter your budget, select a location, and choose at least one category.");
             return;
         }
 
+        setLoading(true);
+        setError(null);
+        setResults(null);
+
         try {
-            const response = await fetch(`/api/budget-tracker?budget=${budget}&location=${location}&categories=${selectedCategories.join(",")}`);
-            if (!response.ok) {
-                throw new Error("Failed to fetch data");
+            // Fetch property services data
+            const response = await fetch("http://localhost:4000/api/property-services");
+            const allServices = await response.json();
+
+            if (!response.ok) throw new Error("Failed to fetch services");
+
+            // Filter services based on user's selection
+            const filteredServices = allServices.filter(
+                (service) =>
+                    service.location === location && selectedCategories.includes(service.category)
+            );
+
+            if (filteredServices.length === 0) {
+                setResults({ status: "no_combination" });
+                return;
             }
-            const data = await response.json();
-            setResults(data);
-        } catch (error) {
-            console.error("Error fetching options:", error);
-            alert("There was an error fetching the options. Please try again later.");
+
+            // Group services by category
+            const servicesByCategory = {};
+            filteredServices.forEach((service) => {
+                if (!servicesByCategory[service.category]) {
+                    servicesByCategory[service.category] = [];
+                }
+                servicesByCategory[service.category].push(service);
+            });
+
+            // Find min and max price combinations
+            let minCombination = [];
+            let maxCombination = [];
+            let minTotal = 0;
+            let maxTotal = 0;
+
+            Object.keys(servicesByCategory).forEach((category) => {
+                const sortedByPrice = servicesByCategory[category].sort((a, b) => a.price - b.price);
+
+                // Find the cheapest and most expensive service in this category
+                const minService = sortedByPrice[0];
+                const maxService = sortedByPrice[sortedByPrice.length - 1];
+
+                minCombination.push(minService);
+                minTotal += minService.price;
+
+                if (maxTotal + maxService.price <= budget) {
+                    maxCombination.push(maxService);
+                    maxTotal += maxService.price;
+                }
+            });
+
+            // Ensure both combinations do not exceed the budget
+            if (minTotal > budget) {
+                setResults({ status: "no_combination" });
+                return;
+            }
+
+            setResults({
+                minCombination,
+                maxCombination: maxTotal > budget ? [] : maxCombination,
+            });
+        } catch (err) {
+            setError(err.message || "An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="p-5">
-            <h2>Budget Tracker</h2>
-            
-            {/* Budget Input */}
-            <input 
-                type="number" 
-                placeholder="Enter Budget" 
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)} 
-            />
+        <div className="max-w-6xl mx-auto p-4">
+            <h1 className="text-3xl font-bold text-center text-amber-600 mb-2">Wedding Package Planner</h1>
+            <p className="text-center text-gray-600 mb-8">Find the perfect wedding services combination within your budget</p>
 
-            {/* Location Dropdown */}
-            <select value={location} onChange={(e) => setLocation(e.target.value)}>
-                {districts.map((dist, index) => (
-                    <option key={index} value={dist}>{dist}</option>
-                ))}
-            </select>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <form onSubmit={findCombinations}>
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div className="mb-4">
+                                <Label htmlFor="budget" value="Your Budget (LKR)" />
+                                <TextInput
+                                    id="budget"
+                                    type="number"
+                                    value={budget}
+                                    onChange={(e) => setBudget(e.target.value)}
+                                    placeholder="Enter your budget"
+                                    required
+                                    min="1000"
+                                />
+                            </div>
 
-            {/* Categories Checkboxes */}
-            <div>
-                {categories.map((cat, index) => (
-                    <label key={index}>
-                        <input 
-                            type="checkbox" 
-                            value={cat} 
-                            checked={selectedCategories.includes(cat)} 
-                            onChange={() => handleCategoryChange(cat)} 
-                        /> 
-                        {cat}
-                    </label>
-                ))}
+                            <div className="mb-4">
+                                <Label htmlFor="location" value="Select Location" />
+                                <Select
+                                    id="location"
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    required
+                                >
+                                    <option value="">-- Select a district --</option>
+                                    {districts.map((district) => (
+                                        <option key={district} value={district}>
+                                            {district}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <Label value="Select Categories" />
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 h-64 overflow-y-auto">
+                                {categories.map((category) => (
+                                    <div key={category} className="flex items-center mb-2">
+                                        <Checkbox
+                                            id={`category-${category}`}
+                                            checked={selectedCategories.includes(category)}
+                                            onChange={() => handleCategoryChange(category)}
+                                            className="mr-2"
+                                        />
+                                        <Label htmlFor={`category-${category}`} value={category} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center mt-6">
+                        <Button type="submit" disabled={loading} color="warning" size="lg">
+                            {loading ? <Spinner size="sm" className="mr-2" /> : "Find Package Combinations"}
+                        </Button>
+                    </div>
+                </form>
             </div>
 
-            {/* Find Options Button */}
-            <button onClick={fetchOptions}>Find Options</button>
+            {error && <Alert color="failure" className="mb-4">{error}</Alert>}
 
-            {/* Display Results */}
             {results && (
-                <div>
-                    <h3>Least Expensive Option:</h3>
-                    {results.least_expensive ? (
-                        <p>{results.least_expensive.name} - {results.least_expensive.category} (LKR {results.least_expensive.totalCost})</p>
+                <div className="bg-white rounded-lg shadow-md p-6">
+                    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                        Package Combinations
+                    </h2>
+
+                    {results.status === "no_combination" ? (
+                        <p className="text-center text-red-600">No suitable combination found within your budget.</p>
                     ) : (
-                        <p>No least expensive option found</p>
-                    )}
-                    
-                    <h3>Most Expensive Option:</h3>
-                    {results.most_expensive ? (
-                        <p>{results.most_expensive.name} - {results.most_expensive.category} (LKR {results.most_expensive.totalCost})</p>
-                    ) : (
-                        <p>No most expensive option found</p>
+                        <>
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-gray-700">Minimum Price Combination</h3>
+                                {results.minCombination.map((service) => (
+                                    <p key={service.name}>{service.category}: {service.name} - LKR {service.price}</p>
+                                ))}
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-700">Maximum Price Combination</h3>
+                                {results.maxCombination.length > 0 ? (
+                                    results.maxCombination.map((service) => (
+                                        <p key={service.name}>{service.category}: {service.name} - LKR {service.price}</p>
+                                    ))
+                                ) : (
+                                    <p className="text-red-600">No valid maximum combination found.</p>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
             )}
@@ -101,4 +212,4 @@ const BudgetTracker = () => {
     );
 };
 
-export default BudgetTracker;
+export default WeddingPackage;
