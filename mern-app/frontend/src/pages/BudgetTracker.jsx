@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button, Label, TextInput, Select, Checkbox, Spinner, Alert, Card, Badge } from "flowbite-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const WeddingPackage = () => {
     const [budget, setBudget] = useState("");
@@ -8,6 +10,8 @@ const WeddingPackage = () => {
     const [results, setResults] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [pdfLoading, setPdfLoading] = useState(false);
+    const resultsRef = useRef(null);
 
     const districts = [
         "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle",
@@ -194,6 +198,64 @@ const WeddingPackage = () => {
     const formatPrice = (price) => {
         return new Intl.NumberFormat('si-LK').format(price);
     };
+    
+    // Function to download results as PDF
+    const downloadPDF = async () => {
+        if (!resultsRef.current) return;
+        
+        setPdfLoading(true);
+        
+        try {
+            const content = resultsRef.current;
+            const canvas = await html2canvas(content, {
+                scale: 1,
+                useCORS: true,
+                logging: false,
+                backgroundColor: "#ffffff"
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+            const imgX = (pdfWidth - imgWidth * ratio) / 2;
+            const imgY = 30;
+            
+            // Add title
+            pdf.setFontSize(18);
+            pdf.setTextColor(173, 101, 0); // Amber color
+            pdf.text("Wedding Package Plan", pdfWidth / 2, 15, { align: "center" });
+            
+            // Add date
+            pdf.setFontSize(10);
+            pdf.setTextColor(100, 100, 100);
+            const date = new Date().toLocaleDateString();
+            pdf.text(`Generated on: ${date}`, pdfWidth - 15, 10, { align: "right" });
+            
+            // Add image
+            pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+            
+            // Add footer
+            pdf.setFontSize(8);
+            pdf.setTextColor(150, 150, 150);
+            pdf.text('© Wedding Package Planner - Your Perfect Wedding Solutions', pdfWidth / 2, pdfHeight - 10, { align: "center" });
+            
+            pdf.save("wedding-package-plan.pdf");
+        } catch (error) {
+            console.error("Error generating PDF: ", error);
+            setError("Failed to generate PDF. Please try again.");
+        } finally {
+            setPdfLoading(false);
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto p-4">
@@ -254,7 +316,7 @@ const WeddingPackage = () => {
                     </div>
 
                     <div className="flex justify-center mt-6">
-                        <Button type="submit" disabled={loading} color="warning" size="lg">
+                        <Button type="submit" disabled={loading} color="black" size="lg">
                             {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages"}
                         </Button>
                     </div>
@@ -265,51 +327,46 @@ const WeddingPackage = () => {
 
             {results && (
                 <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6 pb-3 border-b border-gray-200">
-                        Packages
-                    </h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-semibold text-gray-800 pb-3 border-b border-gray-200">
+                            Packages
+                        </h2>
+                        <Button 
+                            color="amber" 
+                            onClick={downloadPDF} 
+                            disabled={pdfLoading}
+                        >
+                            {pdfLoading ? (
+                                <>
+                                    <Spinner size="sm" className="mr-2" />
+                                    Generating PDF...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                    Download as PDF
+                                </>
+                            )}
+                        </Button>
+                    </div>
 
-                    {results.status === "no_combination" ? (
-                        <p className="text-center text-red-600">No suitable Package found within your budget.</p>
-                    ) : (
-                        <>
-                            <div className="mb-6">
-                                <Card className="mb-6 shadow-md">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
-                                        <Badge color="success" size="lg" className="px-3 py-1.5">
-                                            LKR {formatPrice(results.minTotal)}
-                                        </Badge>
-                                    </div>
-                                    <div className="mt-4">
-                                        {results.minCombination.map((service) => (
-                                            <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
-                                                <div>
-                                                    <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
-                                            <span className="font-semibold">Total Price:</span>
-                                            <span className="font-semibold text-amber-600">LKR {formatPrice(results.minTotal)}</span>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </div>
-
-                            <div className="mb-8">
-                                <Card className="mb-6 shadow-md">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
-                                        {results.maxCombination.length > 0 ? (
-                                            <Badge color="warning" size="lg" className="px-3 py-1.5">
-                                                LKR {formatPrice(results.maxTotal)}
+                    <div ref={resultsRef}>
+                        {results.status === "no_combination" ? (
+                            <p className="text-center text-red-600">No suitable Package found within your budget.</p>
+                        ) : (
+                            <>
+                                <div className="mb-6">
+                                    <Card className="mb-6 shadow-md">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
+                                            <Badge color="success" size="lg" className="px-3 py-1.5">
+                                                LKR {formatPrice(results.minTotal)}
                                             </Badge>
-                                        ) : null}
-                                    </div>
-                                    {results.maxCombination.length > 0 ? (
+                                        </div>
                                         <div className="mt-4">
-                                            {results.maxCombination.map((service) => (
+                                            {results.minCombination.map((service) => (
                                                 <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
                                                     <div>
                                                         <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
@@ -318,64 +375,91 @@ const WeddingPackage = () => {
                                             ))}
                                             <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
                                                 <span className="font-semibold">Total Price:</span>
-                                                <span className="font-semibold text-amber-600">LKR {formatPrice(results.maxTotal)}</span>
+                                                <span className="font-semibold text-amber-600">LKR {formatPrice(results.minTotal)}</span>
                                             </div>
                                         </div>
-                                    ) : (
-                                        <p className="text-red-600">No valid maximum Package found.</p>
-                                    )}
-                                </Card>
-                            </div>
-
-                            {/* Sample Packages Section */}
-                            {/* Replace the Sample Packages Section with this code */}
-{results.samplePackages && results.samplePackages.length > 0 && (
-    <div className="mt-8">
-        <h3 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-200">
-            Sample Package Options
-        </h3>
-        {/* Remove the grid layout and render each card in full width */}
-        {results.samplePackages.map((pkg, index) => (
-            <Card key={index} className="mb-6 shadow-md">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-700">Sample Package {index + 1}</h3>
-                    <Badge color="info" size="lg" className="px-3 py-1.5">
-                        LKR {formatPrice(pkg.total)}
-                    </Badge>
-                </div>
-                <div className="mt-4">
-                    {pkg.combination.map((service) => (
-                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
-                            <div>
-                                <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
-                            </div>
-                        </div>
-                    ))}
-                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
-                        <span className="font-semibold">Total Price:</span>
-                        <span className="font-semibold text-amber-600">LKR {formatPrice(pkg.total)}</span>
-                    </div>
-                </div>
-            </Card>
-        ))}
-    </div>
-)}
-
-                            <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="text-amber-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-lg font-semibold text-amber-700">Budget Summary</h4>
+                                    </Card>
                                 </div>
-                                <p className="text-gray-700">Your budget: <span className="font-bold">LKR {formatPrice(parseInt(budget))}</span></p>
-                                <p className="text-gray-700">Price range: <span className="font-bold">LKR {formatPrice(results.minTotal)} - LKR {formatPrice(results.maxTotal || results.minTotal)}</span></p>
-                                <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p>
-                            </div>
-                        </>
-                    )}
+
+                                <div className="mb-8">
+                                    <Card className="mb-6 shadow-md">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
+                                            {results.maxCombination.length > 0 ? (
+                                                <Badge color="warning" size="lg" className="px-3 py-1.5">
+                                                    LKR {formatPrice(results.maxTotal)}
+                                                </Badge>
+                                            ) : null}
+                                        </div>
+                                        {results.maxCombination.length > 0 ? (
+                                            <div className="mt-4">
+                                                {results.maxCombination.map((service) => (
+                                                    <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                        <div>
+                                                            <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                                    <span className="font-semibold">Total Price:</span>
+                                                    <span className="font-semibold text-amber-600">LKR {formatPrice(results.maxTotal)}</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-red-600">No valid maximum Package found.</p>
+                                        )}
+                                    </Card>
+                                </div>
+
+                                {/* Sample Packages Section */}
+                                {results.samplePackages && results.samplePackages.length > 0 && (
+                                    <div className="mt-8">
+                                        <h3 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-200">
+                                            Sample Package Options
+                                        </h3>
+                                        {/* Remove the grid layout and render each card in full width */}
+                                        {results.samplePackages.map((pkg, index) => (
+                                            <Card key={index} className="mb-6 shadow-md">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h3 className="text-lg font-semibold text-gray-700">Sample Package {index + 1}</h3>
+                                                    <Badge color="info" size="lg" className="px-3 py-1.5">
+                                                        LKR {formatPrice(pkg.total)}
+                                                    </Badge>
+                                                </div>
+                                                <div className="mt-4">
+                                                    {pkg.combination.map((service) => (
+                                                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                            <div>
+                                                                <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                                        <span className="font-semibold">Total Price:</span>
+                                                        <span className="font-semibold text-amber-600">LKR {formatPrice(pkg.total)}</span>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="text-amber-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <h4 className="text-lg font-semibold text-amber-700">Budget Summary</h4>
+                                    </div>
+                                    <p className="text-gray-700">Your budget: <span className="font-bold">LKR {formatPrice(parseInt(budget))}</span></p>
+                                    <p className="text-gray-700">Price range: <span className="font-bold">LKR {formatPrice(results.minTotal)} - LKR {formatPrice(results.maxTotal || results.minTotal)}</span></p>
+                                    <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
