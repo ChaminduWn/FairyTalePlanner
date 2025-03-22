@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Label, TextInput, Select, Checkbox, Spinner, Alert } from "flowbite-react";
+import { Button, Label, TextInput, Select, Checkbox, Spinner, Alert, Card, Badge } from "flowbite-react";
 
 const WeddingPackage = () => {
     const [budget, setBudget] = useState("");
@@ -98,17 +98,101 @@ const WeddingPackage = () => {
                 return;
             }
 
+            // Generate sample packages (between min and max)
+            const samplePackages = generateSamplePackages(servicesByCategory, budget, minCombination, maxCombination);
+
             setResults({
                 minCombination,
                 maxCombination: maxTotal > budget ? [] : maxCombination,
                 minTotal,
                 maxTotal,
+                samplePackages
             });
         } catch (err) {
             setError(err.message || "An error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
+    };
+
+    // Function to generate sample packages between min and max
+    const generateSamplePackages = (servicesByCategory, budget, minCombination, maxCombination) => {
+        let samplePackages = [];
+        
+        // Try to generate up to 3 sample packages
+        for (let attempt = 0; attempt < 3; attempt++) {
+            let sampleCombination = [];
+            let sampleTotal = 0;
+            
+            Object.keys(servicesByCategory).forEach((category) => {
+                const servicesInCategory = servicesByCategory[category];
+                
+                if (servicesInCategory.length > 2) {
+                    // Select a service that's not the min or max for this category
+                    const nonMinMaxServices = servicesInCategory.filter(
+                        service => 
+                            !minCombination.some(s => s.name === service.name) && 
+                            !maxCombination.some(s => s.name === service.name)
+                    );
+                    
+                    if (nonMinMaxServices.length > 0) {
+                        // Pick a random service from the middle range
+                        const midIndex = Math.floor(attempt * nonMinMaxServices.length / 3);
+                        const selectedService = nonMinMaxServices[midIndex] || nonMinMaxServices[0];
+                        
+                        if (sampleTotal + selectedService.price <= budget) {
+                            sampleCombination.push(selectedService);
+                            sampleTotal += selectedService.price;
+                        } else {
+                            // If too expensive, add the min price option
+                            const minService = servicesInCategory[0];
+                            sampleCombination.push(minService);
+                            sampleTotal += minService.price;
+                        }
+                    } else {
+                        // If no middle options, add a random service that fits in budget
+                        const randomIndex = Math.floor(Math.random() * servicesInCategory.length);
+                        const selectedService = servicesInCategory[randomIndex];
+                        
+                        if (sampleTotal + selectedService.price <= budget) {
+                            sampleCombination.push(selectedService);
+                            sampleTotal += selectedService.price;
+                        }
+                    }
+                } else {
+                    // If only 1 or 2 services in category, pick one randomly
+                    const selectedService = servicesInCategory[attempt % servicesInCategory.length];
+                    
+                    if (sampleTotal + selectedService.price <= budget) {
+                        sampleCombination.push(selectedService);
+                        sampleTotal += selectedService.price;
+                    }
+                }
+            });
+            
+            // Only add the sample if it's different from existing packages and within budget
+            if (sampleCombination.length > 0 && sampleTotal <= budget) {
+                // Check if this sample is unique
+                const isDuplicate = samplePackages.some(
+                    (pkg) => 
+                        JSON.stringify(pkg.combination.map(s => s.name).sort()) === 
+                        JSON.stringify(sampleCombination.map(s => s.name).sort())
+                );
+                
+                if (!isDuplicate) {
+                    samplePackages.push({
+                        combination: sampleCombination,
+                        total: sampleTotal
+                    });
+                }
+            }
+        }
+        
+        return samplePackages;
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('si-LK').format(price);
     };
 
     return (
@@ -171,7 +255,7 @@ const WeddingPackage = () => {
 
                     <div className="flex justify-center mt-6">
                         <Button type="submit" disabled={loading} color="warning" size="lg">
-                            {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages "}
+                            {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages"}
                         </Button>
                     </div>
                 </form>
@@ -190,41 +274,105 @@ const WeddingPackage = () => {
                     ) : (
                         <>
                             <div className="mb-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
-                                <div className="mt-4">
-                                    {results.minCombination.map((service) => (
-                                        <div key={service.name} className="flex justify-between items-center mb-2">
-                                            <div>
-                                                <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {service.price}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
-                                        <span className="font-semibold">Total Price:</span>
-                                        <span className="font-semibold text-amber-600">LKR {results.minTotal}</span>
+                                <Card className="mb-6 shadow-md">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
+                                        <Badge color="success" size="lg" className="px-3 py-1.5">
+                                            LKR {formatPrice(results.minTotal)}
+                                        </Badge>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
-                                {results.maxCombination.length > 0 ? (
                                     <div className="mt-4">
-                                        {results.maxCombination.map((service) => (
-                                            <div key={service.name} className="flex justify-between items-center mb-2">
+                                        {results.minCombination.map((service) => (
+                                            <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
                                                 <div>
-                                                    <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {service.price}
+                                                    <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                 </div>
                                             </div>
                                         ))}
                                         <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
                                             <span className="font-semibold">Total Price:</span>
-                                            <span className="font-semibold text-amber-600">LKR {results.maxTotal}</span>
+                                            <span className="font-semibold text-amber-600">LKR {formatPrice(results.minTotal)}</span>
                                         </div>
                                     </div>
-                                ) : (
-                                    <p className="text-red-600">No valid maximum Package found.</p>
-                                )}
+                                </Card>
+                            </div>
+
+                            <div className="mb-8">
+                                <Card className="mb-6 shadow-md">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
+                                        {results.maxCombination.length > 0 ? (
+                                            <Badge color="warning" size="lg" className="px-3 py-1.5">
+                                                LKR {formatPrice(results.maxTotal)}
+                                            </Badge>
+                                        ) : null}
+                                    </div>
+                                    {results.maxCombination.length > 0 ? (
+                                        <div className="mt-4">
+                                            {results.maxCombination.map((service) => (
+                                                <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                    <div>
+                                                        <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                                <span className="font-semibold">Total Price:</span>
+                                                <span className="font-semibold text-amber-600">LKR {formatPrice(results.maxTotal)}</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-red-600">No valid maximum Package found.</p>
+                                    )}
+                                </Card>
+                            </div>
+
+                            {/* Sample Packages Section */}
+                            {/* Replace the Sample Packages Section with this code */}
+{results.samplePackages && results.samplePackages.length > 0 && (
+    <div className="mt-8">
+        <h3 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-200">
+            Sample Package Options
+        </h3>
+        {/* Remove the grid layout and render each card in full width */}
+        {results.samplePackages.map((pkg, index) => (
+            <Card key={index} className="mb-6 shadow-md">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-gray-700">Sample Package {index + 1}</h3>
+                    <Badge color="info" size="lg" className="px-3 py-1.5">
+                        LKR {formatPrice(pkg.total)}
+                    </Badge>
+                </div>
+                <div className="mt-4">
+                    {pkg.combination.map((service) => (
+                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                            <div>
+                                <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
+                            </div>
+                        </div>
+                    ))}
+                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                        <span className="font-semibold">Total Price:</span>
+                        <span className="font-semibold text-amber-600">LKR {formatPrice(pkg.total)}</span>
+                    </div>
+                </div>
+            </Card>
+        ))}
+    </div>
+)}
+
+                            <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="text-amber-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <h4 className="text-lg font-semibold text-amber-700">Budget Summary</h4>
+                                </div>
+                                <p className="text-gray-700">Your budget: <span className="font-bold">LKR {formatPrice(parseInt(budget))}</span></p>
+                                <p className="text-gray-700">Price range: <span className="font-bold">LKR {formatPrice(results.minTotal)} - LKR {formatPrice(results.maxTotal || results.minTotal)}</span></p>
+                                <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p>
                             </div>
                         </>
                     )}
