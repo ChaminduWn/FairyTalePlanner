@@ -26,7 +26,7 @@ const WeddingPackage = () => {
     const categories = [
         "Photography", "Bridal Service", "Photo Location", "Groom Dressing",
         "Car Rental", "Entertainment Services", "Invitation & Gift Services",
-        "Private Villa", "Hotel",
+        "Honeymoon", "Hotel",
     ];
 
     const handleCategoryChange = (category) => {

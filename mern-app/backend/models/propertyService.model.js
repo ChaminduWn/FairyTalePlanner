@@ -8,7 +8,7 @@ const districts = [
 
 const categories = [
   "Photography", "Bridal Service", "Photo Location", "Groom Dressing", "Car Rental", 
-  "Entertainment Services", "Invitation & Gift Services", "Private Villa","Hotel"
+  "Entertainment Services", "Invitation & Gift Services", "Honeymoon","Hotel"
 ];
 
 const propertyServiceSchema = new mongoose.Schema({
