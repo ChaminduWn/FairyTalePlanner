@@ -70,7 +70,7 @@ const WeddingPackage = () => {
                 servicesByCategory[service.category].push(service);
             });
 
-            // Find min and max price combinations
+            // Find min and max price Packages
             let minCombination = [];
             let maxCombination = [];
             let minTotal = 0;
@@ -101,6 +101,8 @@ const WeddingPackage = () => {
             setResults({
                 minCombination,
                 maxCombination: maxTotal > budget ? [] : maxCombination,
+                minTotal,
+                maxTotal,
             });
         } catch (err) {
             setError(err.message || "An error occurred. Please try again.");
@@ -169,7 +171,7 @@ const WeddingPackage = () => {
 
                     <div className="flex justify-center mt-6">
                         <Button type="submit" disabled={loading} color="warning" size="lg">
-                            {loading ? <Spinner size="sm" className="mr-2" /> : "Find Package Combinations"}
+                            {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages "}
                         </Button>
                     </div>
                 </form>
@@ -180,28 +182,48 @@ const WeddingPackage = () => {
             {results && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6 pb-3 border-b border-gray-200">
-                        Package Combinations
+                        Packages
                     </h2>
 
                     {results.status === "no_combination" ? (
-                        <p className="text-center text-red-600">No suitable combination found within your budget.</p>
+                        <p className="text-center text-red-600">No suitable Package found within your budget.</p>
                     ) : (
                         <>
                             <div className="mb-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Minimum Price Combination</h3>
-                                {results.minCombination.map((service) => (
-                                    <p key={service.name}>{service.category}: {service.name} - LKR {service.price}</p>
-                                ))}
+                                <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
+                                <div className="mt-4">
+                                    {results.minCombination.map((service) => (
+                                        <div key={service.name} className="flex justify-between items-center mb-2">
+                                            <div>
+                                                <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {service.price}
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                        <span className="font-semibold">Total Price:</span>
+                                        <span className="font-semibold text-amber-600">LKR {results.minTotal}</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-700">Maximum Price Combination</h3>
+                                <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
                                 {results.maxCombination.length > 0 ? (
-                                    results.maxCombination.map((service) => (
-                                        <p key={service.name}>{service.category}: {service.name} - LKR {service.price}</p>
-                                    ))
+                                    <div className="mt-4">
+                                        {results.maxCombination.map((service) => (
+                                            <div key={service.name} className="flex justify-between items-center mb-2">
+                                                <div>
+                                                    <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {service.price}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                            <span className="font-semibold">Total Price:</span>
+                                            <span className="font-semibold text-amber-600">LKR {results.maxTotal}</span>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <p className="text-red-600">No valid maximum combination found.</p>
+                                    <p className="text-red-600">No valid maximum Package found.</p>
                                 )}
                             </div>
                         </>
