@@ -382,7 +382,7 @@ const WeddingPackage = () => {
             
             pdf.setFontSize(8);
             pdf.setTextColor(150, 150, 150);
-            pdf.text("* Prices may vary based on availability and seasonality.", 15, yPosition);
+            // pdf.text("* Prices may vary based on availability and seasonality.", 15, yPosition);
             
             // Add footer
             pdf.setFontSize(8);
@@ -400,15 +400,15 @@ const WeddingPackage = () => {
 
     return (
         <div className="max-w-6xl mx-auto p-4">
-            <h1 className="text-3xl font-bold text-center text-amber-600 mb-2">Wedding Package Planner</h1>
-            <p className="text-center text-gray-600 mb-8">Find the perfect wedding services combination within your budget</p>
+            <h1 className="text-3xl font-bold text-center text-purple-600 mb-2">Wedding Package Planner</h1>
+            <p className="text-center text-gray-600 text-xl mb-8">Find the perfect wedding services combination within your budget</p>
 
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div className="bg-white rounded-lg border-t-4 border-gray-200 shadow-md p-6 mb-8">
                 <form onSubmit={findCombinations}>
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <div className="mb-4">
-                                <Label htmlFor="budget" value="Your Budget (LKR)" />
+                                <Label htmlFor="budget" value="Your Budget (LKR)" className="text-md" />
                                 <TextInput
                                     id="budget"
                                     type="number"
@@ -416,21 +416,23 @@ const WeddingPackage = () => {
                                     onChange={(e) => setBudget(e.target.value)}
                                     placeholder="Enter your budget"
                                     required
+                                    className="text-md"
                                     min="1000"
                                 />
                             </div>
 
                             <div className="mb-4">
-                                <Label htmlFor="location" value="Select Location" />
+                                <Label htmlFor="location" value="Select Location" className="text-md" />
                                 <Select
                                     id="location"
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                     required
+                                    className="text-md"
                                 >
                                     <option value="">-- Select a district --</option>
                                     {districts.map((district) => (
-                                        <option key={district} value={district}>
+                                        <option key={district} value={district} className="text-md">
                                             {district}
                                         </option>
                                     ))}
@@ -439,28 +441,38 @@ const WeddingPackage = () => {
                         </div>
 
                         <div>
-                            <Label value="Select Categories" />
+                            <Label value="Select Categories" className="text-md" />
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 h-64 overflow-y-auto">
                                 {categories.map((category) => (
-                                    <div key={category} className="flex items-center mb-2">
+                                    <div key={category} className="flex items-center mb-2 text-md">
                                         <Checkbox
                                             id={`category-${category}`}
                                             checked={selectedCategories.includes(category)}
                                             onChange={() => handleCategoryChange(category)}
                                             className="mr-2"
                                         />
-                                        <Label htmlFor={`category-${category}`} value={category} />
+                                        <Label htmlFor={`category-${category}`} value={category} className="text-md"/>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex justify-center mt-6">
+                    {/* <div className="flex justify-center mt-6">
                         <Button type="submit" disabled={loading} color="black" size="lg">
                             {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages"}
                         </Button>
-                    </div>
+                    </div> */}
+
+<div className="flex justify-center mt-6">
+    <Button
+        type="submit"
+        disabled={loading}
+        className="bg-purple-600 text-white font-semibold text-lg rounded-md py-1 px-6 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 disabled:opacity-50"
+    >
+        {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages"}
+    </Button>
+</div>
                 </form>
             </div>
 
@@ -596,7 +608,7 @@ const WeddingPackage = () => {
                                     </div>
                                     <p className="text-gray-700">Your budget: <span className="font-bold">LKR {formatPrice(parseInt(budget))}</span></p>
                                     <p className="text-gray-700">Price range: <span className="font-bold">LKR {formatPrice(results.minTotal)} - LKR {formatPrice(results.maxTotal || results.minTotal)}</span></p>
-                                    <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p>
+                                    {/* <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p> */}
                                 </div>
                             </>
                         )}
