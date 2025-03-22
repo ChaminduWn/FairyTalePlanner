@@ -11,7 +11,9 @@ const WeddingPackage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [pdfLoading, setPdfLoading] = useState(false);
-    const resultsRef = useRef(null);
+    
+    // Separate ref for PDF content to make it hidden from normal view
+    const pdfContentRef = useRef(null);
 
     const districts = [
         "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle",
@@ -201,52 +203,191 @@ const WeddingPackage = () => {
     
     // Function to download results as PDF
     const downloadPDF = async () => {
-        if (!resultsRef.current) return;
+        if (!results) return;
         
         setPdfLoading(true);
         
         try {
-            const content = resultsRef.current;
-            const canvas = await html2canvas(content, {
-                scale: 1,
-                useCORS: true,
-                logging: false,
-                backgroundColor: "#ffffff"
-            });
-            
-            const imgData = canvas.toDataURL('image/png');
+            // Create PDF directly
             const pdf = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
                 format: 'a4'
             });
             
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-            const imgX = (pdfWidth - imgWidth * ratio) / 2;
-            const imgY = 30;
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const contentWidth = pageWidth - 20; // 10mm margins on each side
             
             // Add title
-            pdf.setFontSize(18);
-            pdf.setTextColor(173, 101, 0); // Amber color
-            pdf.text("Wedding Package Plan", pdfWidth / 2, 15, { align: "center" });
+            pdf.setFontSize(16);
+            pdf.setTextColor(173, 101, 0); // Amber color for title
+            pdf.text("Wedding Package Plan", pageWidth / 2, 15, { align: "center" });
             
-            // Add date
+            // Add horizontal line
+            pdf.setDrawColor(220, 220, 220);
+            pdf.line(10, 20, pageWidth - 10, 20);
+            
+            let yPosition = 30;
+            const lineHeight = 8;
+            
+            // Minimum Price Package
+            pdf.setFontSize(12);
+            pdf.setTextColor(60, 60, 60);
+            pdf.text(`Minimum Price Package  LKR ${formatPrice(results.minTotal)}`, 15, yPosition);
+            
+            yPosition += lineHeight + 5;
+            
+            // Render minimum price package details
+            results.minCombination.forEach((service) => {
+                pdf.setFontSize(10);
+                pdf.setTextColor(173, 101, 0);
+                pdf.text(`${service.category}:`, 30, yPosition);
+                
+                pdf.setTextColor(60, 60, 60);
+                pdf.text(`${service.name} - LKR ${formatPrice(service.price)}`, 90, yPosition);
+                
+                yPosition += lineHeight;
+            });
+            
+            // Total Price for minimum package
+            yPosition += 5;
             pdf.setFontSize(10);
-            pdf.setTextColor(100, 100, 100);
-            const date = new Date().toLocaleDateString();
-            pdf.text(`Generated on: ${date}`, pdfWidth - 15, 10, { align: "right" });
+            pdf.setTextColor(60, 60, 60);
+            pdf.text("Total Price:", 30, yPosition);
             
-            // Add image
-            pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+            pdf.setTextColor(173, 101, 0);
+            pdf.text(`LKR ${formatPrice(results.minTotal)}`, pageWidth - 30, yPosition, { align: "right" });
+            
+            // Add horizontal line
+            yPosition += 5;
+            pdf.setDrawColor(220, 220, 220);
+            pdf.line(10, yPosition, pageWidth - 10, yPosition);
+            
+            yPosition += lineHeight + 5;
+            
+            // Maximum Price Package
+            pdf.setFontSize(12);
+            pdf.setTextColor(60, 60, 60);
+            pdf.text(`Maximum Price Package  LKR ${formatPrice(results.maxTotal)}`, 15, yPosition);
+            
+            yPosition += lineHeight + 5;
+            
+            // Render maximum price package details
+            if (results.maxCombination && results.maxCombination.length > 0) {
+                results.maxCombination.forEach((service) => {
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(173, 101, 0);
+                    pdf.text(`${service.category}:`, 30, yPosition);
+                    
+                    pdf.setTextColor(60, 60, 60);
+                    pdf.text(`${service.name} - LKR ${formatPrice(service.price)}`, 90, yPosition);
+                    
+                    yPosition += lineHeight;
+                });
+                
+                // Total Price for maximum package
+                yPosition += 5;
+                pdf.setFontSize(10);
+                pdf.setTextColor(60, 60, 60);
+                pdf.text("Total Price:", 30, yPosition);
+                
+                pdf.setTextColor(173, 101, 0);
+                pdf.text(`LKR ${formatPrice(results.maxTotal)}`, pageWidth - 30, yPosition, { align: "right" });
+            } else {
+                pdf.setTextColor(255, 0, 0);
+                pdf.text("No valid maximum Package found.", 30, yPosition);
+            }
+            
+            // Add horizontal line
+            yPosition += 5;
+            pdf.setDrawColor(220, 220, 220);
+            pdf.line(10, yPosition, pageWidth - 10, yPosition);
+            
+            yPosition += lineHeight + 5;
+            
+            // Sample Package Options
+            if (results.samplePackages && results.samplePackages.length > 0) {
+                pdf.setFontSize(14);
+                pdf.setTextColor(60, 60, 60);
+                pdf.text("Sample Package Options", 15, yPosition);
+                
+                yPosition += lineHeight + 5;
+                
+                // Render each sample package
+                results.samplePackages.forEach((pkg, index) => {
+                    // If the content will overflow to the next page, add a new page
+                    if (yPosition > 250) {
+                        pdf.addPage();
+                        yPosition = 20;
+                    }
+                    
+                    pdf.setFontSize(12);
+                    pdf.setTextColor(60, 60, 60);
+                    pdf.text(`Sample Package ${index + 1}  LKR ${formatPrice(pkg.total)}`, 15, yPosition);
+                    
+                    yPosition += lineHeight + 5;
+                    
+                    // Render sample package details
+                    pkg.combination.forEach((service) => {
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(173, 101, 0);
+                        pdf.text(`${service.category}:`, 30, yPosition);
+                        
+                        pdf.setTextColor(60, 60, 60);
+                        pdf.text(`${service.name} - LKR ${formatPrice(service.price)}`, 90, yPosition);
+                        
+                        yPosition += lineHeight;
+                    });
+                    
+                    // Total Price for sample package
+                    yPosition += 5;
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(60, 60, 60);
+                    pdf.text("Total Price:", 30, yPosition);
+                    
+                    pdf.setTextColor(173, 101, 0);
+                    pdf.text(`LKR ${formatPrice(pkg.total)}`, pageWidth - 30, yPosition, { align: "right" });
+                    
+                    yPosition += lineHeight + 5;
+                });
+            }
+            
+            // If the content will overflow to the next page, add a new page
+            if (yPosition > 240) {
+                pdf.addPage();
+                yPosition = 20;
+            }
+            
+            // Budget Summary
+            pdf.setFillColor(255, 250, 230); // Light amber background
+            pdf.rect(10, yPosition, pageWidth - 20, 35, 'F');
+            
+            yPosition += 10;
+            
+            pdf.setFontSize(12);
+            pdf.setTextColor(173, 101, 0);
+            pdf.text("Budget Summary", 15, yPosition);
+            
+            yPosition += lineHeight + 2;
+            
+            pdf.setFontSize(10);
+            pdf.setTextColor(60, 60, 60);
+            pdf.text(`Your budget: LKR ${formatPrice(parseInt(budget))}`, 15, yPosition);
+            
+            yPosition += lineHeight;
+            
+            pdf.text(`Price range: LKR ${formatPrice(results.minTotal)} - LKR ${formatPrice(results.maxTotal || results.minTotal)}`, 15, yPosition);
+            
+            yPosition += lineHeight;
+            
+            pdf.setFontSize(8);
+            pdf.setTextColor(150, 150, 150);
+            pdf.text("* Prices may vary based on availability and seasonality.", 15, yPosition);
             
             // Add footer
             pdf.setFontSize(8);
             pdf.setTextColor(150, 150, 150);
-            pdf.text('© Wedding Package Planner - Your Perfect Wedding Solutions', pdfWidth / 2, pdfHeight - 10, { align: "center" });
+            pdf.text('© Wedding Package Planner - Your Perfect Wedding Solutions', pageWidth / 2, pdf.internal.pageSize.getHeight() - 10, { align: "center" });
             
             pdf.save("wedding-package-plan.pdf");
         } catch (error) {
@@ -328,7 +469,7 @@ const WeddingPackage = () => {
             {results && (
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-semibold text-gray-800 pb-3 border-b border-gray-200">
+                        <h2 className="text-2xl font-semibold text-gray-800 pb-3">
                             Packages
                         </h2>
                         <Button 
@@ -352,13 +493,13 @@ const WeddingPackage = () => {
                         </Button>
                     </div>
 
-                    <div ref={resultsRef}>
+                    <div>
                         {results.status === "no_combination" ? (
                             <p className="text-center text-red-600">No suitable Package found within your budget.</p>
                         ) : (
                             <>
                                 <div className="mb-6">
-                                    <Card className="mb-6 shadow-md">
+                                    <Card className="mb-6 shadow-md border border-gray-100">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
                                             <Badge color="success" size="lg" className="px-3 py-1.5">
@@ -367,7 +508,7 @@ const WeddingPackage = () => {
                                         </div>
                                         <div className="mt-4">
                                             {results.minCombination.map((service) => (
-                                                <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
                                                     <div>
                                                         <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                     </div>
@@ -382,7 +523,7 @@ const WeddingPackage = () => {
                                 </div>
 
                                 <div className="mb-8">
-                                    <Card className="mb-6 shadow-md">
+                                    <Card className="mb-6 shadow-md border border-gray-100">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
                                             {results.maxCombination.length > 0 ? (
@@ -394,7 +535,7 @@ const WeddingPackage = () => {
                                         {results.maxCombination.length > 0 ? (
                                             <div className="mt-4">
                                                 {results.maxCombination.map((service) => (
-                                                    <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                    <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
                                                         <div>
                                                             <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                         </div>
@@ -419,7 +560,7 @@ const WeddingPackage = () => {
                                         </h3>
                                         {/* Remove the grid layout and render each card in full width */}
                                         {results.samplePackages.map((pkg, index) => (
-                                            <Card key={index} className="mb-6 shadow-md">
+                                            <Card key={index} className="mb-6 shadow-md border border-gray-100">
                                                 <div className="flex justify-between items-center mb-4">
                                                     <h3 className="text-lg font-semibold text-gray-700">Sample Package {index + 1}</h3>
                                                     <Badge color="info" size="lg" className="px-3 py-1.5">
@@ -428,7 +569,7 @@ const WeddingPackage = () => {
                                                 </div>
                                                 <div className="mt-4">
                                                     {pkg.combination.map((service) => (
-                                                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
                                                             <div>
                                                                 <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                             </div>
