@@ -26,7 +26,7 @@ export default function EmployeeLogin() {
 
     try {
       dispatch(signInStart());
-      const res = await fetch("http://localhost:4000/api/login", {
+      const res = await fetch("/api/authEmployeeRoutes/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

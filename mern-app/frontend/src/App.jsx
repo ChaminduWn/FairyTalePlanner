@@ -5,6 +5,9 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import About from "./pages/About.jsx";
 import EmployeeLogin from "./pages/EmployeeLogin.jsx";
+import AdminPrivateRoute from "./components/AdminPrivateRoutes.jsx";
+import AdminDashboard from "./pages/AdminDashborad.jsx";
+import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx";
 
 
 function App() {
@@ -22,6 +25,16 @@ function App() {
 
 
           {/* <Route path="/budget-tracker" element={<BudgetTracker />} /> */}
+
+          <Route element={<AdminPrivateRoute />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
+          <Route
+            path="/view-employee-details/:empId"
+            element={<AdminViewEmployeeDetails />}
+          />
+
+        </Route>
 
 
         </Routes>
