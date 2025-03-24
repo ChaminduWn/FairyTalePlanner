@@ -30,13 +30,17 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+app.listen(4000, () => {
+  console.log('Server is running on port 4000!!');
+});
+
 // Routes
 app.use("/api/budget", BudgetRoutes);
 app.use("/api/location", LocationsRoutes);
-app.use("/api/employee", employeeRoutes);
-app.use("/api/auth", authEmployeeRoutes); // Fixed route naming
+app.use("/api/employee", employeeRoutes);  
+app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
 
-// ✅ Global Error Handler
+// ✅ FIXED: Global Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -48,6 +52,3 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ Start Server
-app.listen(4000, () => {
-  console.log('Server is running on port 4000!!');
-});
