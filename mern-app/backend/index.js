@@ -33,8 +33,8 @@ app.use(cookieParser());
 
 // Routes
 app.use("/api/", BudgetRoutes);
-app.use("/api/", employeeRoutes);  
-app.use("/api/", authEmployeeRoutes); 
+app.use("/api/employee", employeeRoutes);  
+app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
 
 // ✅ FIXED: Global Error Handler
 app.use((err, req, res, next) => {
