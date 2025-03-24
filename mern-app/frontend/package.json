@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.6",
     "@react-pdf/renderer": "^4.3.0",
+    "@reduxjs/toolkit": "^2.6.1",
     "firebase": "^11.5.0",
     "flowbite-react": "^0.10.2",
     "html2canvas": "^1.4.1",
