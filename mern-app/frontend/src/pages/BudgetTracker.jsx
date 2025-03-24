@@ -51,7 +51,7 @@ const WeddingPackage = () => {
 
         try {
             // Fetch property services data
-            const response = await fetch("http://localhost:4000/api/property-services");
+            const response = await fetch("/api/budget/property-services");
             const allServices = await response.json();
 
             if (!response.ok) throw new Error("Failed to fetch services");
@@ -399,13 +399,13 @@ const WeddingPackage = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto p-4">
-            <h1 className="text-3xl font-bold text-center text-purple-600 mb-2">Wedding Package Planner</h1>
-            <p className="text-center text-gray-600 text-xl mb-8">Find the perfect wedding services combination within your budget</p>
+        <div className="max-w-6xl p-4 mx-auto">
+            <h1 className="mb-2 text-3xl font-bold text-center text-purple-600">Wedding Package Planner</h1>
+            <p className="mb-8 text-xl text-center text-gray-600">Find the perfect wedding services combination within your budget</p>
 
-            <div className="bg-white rounded-lg border-t-4 border-gray-200 shadow-md p-6 mb-8">
+            <div className="p-6 mb-8 bg-white border-t-4 border-gray-200 rounded-lg shadow-md">
                 <form onSubmit={findCombinations}>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid gap-6 md:grid-cols-2">
                         <div>
                             <div className="mb-4">
                                 <Label htmlFor="budget" value="Your Budget (LKR)" className="text-md" />
@@ -442,7 +442,7 @@ const WeddingPackage = () => {
 
                         <div>
                             <Label value="Select Categories" className="text-md" />
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 h-64 overflow-y-auto">
+                            <div className="h-64 p-4 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
                                 {categories.map((category) => (
                                     <div key={category} className="flex items-center mb-2 text-md">
                                         <Checkbox
@@ -468,7 +468,7 @@ const WeddingPackage = () => {
     <Button
         type="submit"
         disabled={loading}
-        className="bg-purple-600 text-white font-semibold text-lg rounded-md py-1 px-6 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 disabled:opacity-50"
+        className="px-6 py-1 text-lg font-semibold text-white transition-all duration-300 ease-in-out transform bg-purple-600 rounded-md hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 disabled:opacity-50"
     >
         {loading ? <Spinner size="sm" className="mr-2" /> : "Find suitable Packages"}
     </Button>
@@ -479,9 +479,9 @@ const WeddingPackage = () => {
             {error && <Alert color="failure" className="mb-4">{error}</Alert>}
 
             {results && (
-                <div className="bg-white rounded-lg shadow-md p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-semibold text-gray-800 pb-3">
+                <div className="p-6 bg-white rounded-lg shadow-md">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="pb-3 text-2xl font-semibold text-gray-800">
                             Packages
                         </h2>
                         <Button 
@@ -511,8 +511,8 @@ const WeddingPackage = () => {
                         ) : (
                             <>
                                 <div className="mb-6">
-                                    <Card className="mb-6 shadow-md border border-gray-100">
-                                        <div className="flex justify-between items-center mb-4">
+                                    <Card className="mb-6 border border-gray-100 shadow-md">
+                                        <div className="flex items-center justify-between mb-4">
                                             <h3 className="text-lg font-semibold text-gray-700">Minimum Price Package</h3>
                                             <Badge color="success" size="lg" className="px-3 py-1.5">
                                                 LKR {formatPrice(results.minTotal)}
@@ -520,13 +520,13 @@ const WeddingPackage = () => {
                                         </div>
                                         <div className="mt-4">
                                             {results.minCombination.map((service) => (
-                                                <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
+                                                <div key={service.name} className="flex items-center justify-between p-2 mb-2 bg-white rounded-lg">
                                                     <div>
                                                         <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                     </div>
                                                 </div>
                                             ))}
-                                            <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                            <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
                                                 <span className="font-semibold">Total Price:</span>
                                                 <span className="font-semibold text-amber-600">LKR {formatPrice(results.minTotal)}</span>
                                             </div>
@@ -535,8 +535,8 @@ const WeddingPackage = () => {
                                 </div>
 
                                 <div className="mb-8">
-                                    <Card className="mb-6 shadow-md border border-gray-100">
-                                        <div className="flex justify-between items-center mb-4">
+                                    <Card className="mb-6 border border-gray-100 shadow-md">
+                                        <div className="flex items-center justify-between mb-4">
                                             <h3 className="text-lg font-semibold text-gray-700">Maximum Price Package</h3>
                                             {results.maxCombination.length > 0 ? (
                                                 <Badge color="warning" size="lg" className="px-3 py-1.5">
@@ -547,13 +547,13 @@ const WeddingPackage = () => {
                                         {results.maxCombination.length > 0 ? (
                                             <div className="mt-4">
                                                 {results.maxCombination.map((service) => (
-                                                    <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
+                                                    <div key={service.name} className="flex items-center justify-between p-2 mb-2 bg-white rounded-lg">
                                                         <div>
                                                             <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                         </div>
                                                     </div>
                                                 ))}
-                                                <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                                <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
                                                     <span className="font-semibold">Total Price:</span>
                                                     <span className="font-semibold text-amber-600">LKR {formatPrice(results.maxTotal)}</span>
                                                 </div>
@@ -567,13 +567,13 @@ const WeddingPackage = () => {
                                 {/* Sample Packages Section */}
                                 {results.samplePackages && results.samplePackages.length > 0 && (
                                     <div className="mt-8">
-                                        <h3 className="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b border-gray-200">
+                                        <h3 className="pb-2 mb-4 text-xl font-semibold text-gray-700 border-b border-gray-200">
                                             Sample Package Options
                                         </h3>
                                         {/* Remove the grid layout and render each card in full width */}
                                         {results.samplePackages.map((pkg, index) => (
-                                            <Card key={index} className="mb-6 shadow-md border border-gray-100">
-                                                <div className="flex justify-between items-center mb-4">
+                                            <Card key={index} className="mb-6 border border-gray-100 shadow-md">
+                                                <div className="flex items-center justify-between mb-4">
                                                     <h3 className="text-lg font-semibold text-gray-700">Sample Package {index + 1}</h3>
                                                     <Badge color="info" size="lg" className="px-3 py-1.5">
                                                         LKR {formatPrice(pkg.total)}
@@ -581,13 +581,13 @@ const WeddingPackage = () => {
                                                 </div>
                                                 <div className="mt-4">
                                                     {pkg.combination.map((service) => (
-                                                        <div key={service.name} className="flex justify-between items-center mb-2 p-2 bg-white rounded-lg">
+                                                        <div key={service.name} className="flex items-center justify-between p-2 mb-2 bg-white rounded-lg">
                                                             <div>
                                                                 <span className="font-semibold text-amber-600">{service.category}:</span> {service.name} - LKR {formatPrice(service.price)}
                                                             </div>
                                                         </div>
                                                     ))}
-                                                    <div className="flex justify-between items-center mt-4 border-t border-gray-200 pt-4">
+                                                    <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
                                                         <span className="font-semibold">Total Price:</span>
                                                         <span className="font-semibold text-amber-600">LKR {formatPrice(pkg.total)}</span>
                                                     </div>
@@ -597,10 +597,10 @@ const WeddingPackage = () => {
                                     </div>
                                 )}
 
-                                <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                <div className="p-4 mt-6 border rounded-lg bg-amber-50 border-amber-200">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="text-amber-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                             </svg>
                                         </div>
@@ -608,7 +608,7 @@ const WeddingPackage = () => {
                                     </div>
                                     <p className="text-gray-700">Your budget: <span className="font-bold">LKR {formatPrice(parseInt(budget))}</span></p>
                                     <p className="text-gray-700">Price range: <span className="font-bold">LKR {formatPrice(results.minTotal)} - LKR {formatPrice(results.maxTotal || results.minTotal)}</span></p>
-                                    {/* <p className="text-sm text-gray-500 mt-2">* Prices may vary based on availability and seasonality.</p> */}
+                                    {/* <p className="mt-2 text-sm text-gray-500">* Prices may vary based on availability and seasonality.</p> */}
                                 </div>
                             </>
                         )}

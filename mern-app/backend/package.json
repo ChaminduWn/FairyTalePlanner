@@ -3,19 +3,22 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-
   "scripts": {
-  "start": "node index.js",
-  "dev": "nodemon index.js"
-},
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@react-google-maps/api": "^2.20.6",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.1"
   }

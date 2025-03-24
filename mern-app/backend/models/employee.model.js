@@ -14,10 +14,6 @@ const employeeSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    profilePicture: {
-        type: String,
-        default: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/profile-design-template-4c23db68ba79c4186fbd258aa06f48b3_screen.jpg",
-    },
     address: {
         type: String,
         required: true,
@@ -43,10 +39,13 @@ const employeeSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        default: "Manager",
+        default: "employee",
     },
    
-    
+    profilePicture: {
+        type: String,
+        default: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/profile-design-template-4c23db68ba79c4186fbd258aa06f48b3_screen.jpg",
+    },
     isAdmin: {
         type: Boolean,
         default: false,
