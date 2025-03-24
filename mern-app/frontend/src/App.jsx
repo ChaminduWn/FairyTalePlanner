@@ -4,6 +4,7 @@ import Home from "./pages/Home.jsx";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import About from "./pages/About.jsx";
+import LocationMap from "./pages/LocationMap.jsx";
 import EmployeeLogin from "./pages/EmployeeLogin.jsx";
 import AdminPrivateRoute from "./components/AdminPrivateRoutes.jsx";
 import AdminDashboard from "./pages/AdminDashborad.jsx";
@@ -13,7 +14,8 @@ import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx"
 function App() {
   return (
     <BrowserRouter>
-      <div>
+          <Header />
+
         {/* <h1>Wedding Budget Planning System</h1> */}
         <Routes>
           <Route path="/" element={<Home />} />
@@ -21,12 +23,14 @@ function App() {
           <Route path="/header" element={<Header />} />
           <Route path="/footer" element={<Footer />} />
           <Route path="/about" element={<About/>} />
+          <Route path="/location-map" element={<LocationMap/>} />
           <Route path="/employee-login" element={<EmployeeLogin />} />
 
 
           {/* <Route path="/budget-tracker" element={<BudgetTracker />} /> */}
+          
 
-          <Route element={<AdminPrivateRoute />}>
+        <Route element={<AdminPrivateRoute />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
           <Route
@@ -36,9 +40,9 @@ function App() {
 
         </Route>
 
-
         </Routes>
-      </div>
+        <Footer />
+
     </BrowserRouter>
   );
 }

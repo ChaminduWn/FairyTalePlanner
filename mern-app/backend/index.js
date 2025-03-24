@@ -5,6 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import BudgetRoutes from './routes/budgetRoutes.js';
+import LocationsRoutes from './routes/locationsRoutes.js';
 import authEmployeeRoutes from './routes/authEmployee.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 
@@ -21,22 +22,21 @@ mongoose
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Frontend URL
-    credentials: true, // Allow cookies
-  })
-);
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true // If you're using cookies
+}));
 
 app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use("/api/", BudgetRoutes);
-app.use("/api/employee", employeeRoutes);  
-app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
+app.use("/api/budget", BudgetRoutes);
+app.use("/api/location", LocationsRoutes);
+app.use("/api/employee", employeeRoutes);
+app.use("/api/auth", authEmployeeRoutes); // Fixed route naming
 
-// ✅ FIXED: Global Error Handler
+// ✅ Global Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';

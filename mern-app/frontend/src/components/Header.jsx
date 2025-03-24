@@ -1,127 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Navbar, Dropdown, Avatar } from 'flowbite-react';
-import { FaUserCircle, FaSignInAlt, FaUserPlus, FaBars } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Avatar, Button, Dropdown, DropdownDivider, TextInput } from "flowbite-react";
+import { signoutSuccess } from "../redux/user/userSlice";
+import { useEffect, useState } from "react";
+import { AiOutlineSearch } from "react-icons/ai";
+import logo from "../assets/logo.png";
 
-const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
 
-  useEffect(() => {
-    // Check if user is logged in from localStorage or context
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsLoggedIn(true);
-      setUserRole(JSON.parse(user).role);
-    }
-  }, []);
+export default function Header() {
+    const path = useLocation().pathname;
+    const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user);
+    const [searchTerm, setSearchTerm] = useState('');
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    setUserRole(null);
-    // Redirect to home page
-    window.location.href = '/';
-  };
+    useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const searchTermFromUrl = urlParams.get('searchTerm');
+        if (searchTermFromUrl) {
+            setSearchTerm(searchTermFromUrl);
+        }
+    }, [location.search]);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Services', path: '/services' },
-    { name: 'Locations', path: '/locations' },
-    { name: 'Budget Planner', path: '/budget-planner' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
-  ];
+    const handleSignout = async () => {
+        try {
+            // Get userId before clearing
+            const userId = localStorage.getItem('userId');
+    
+            const res = await fetch('/api/user/signout', {
+                method: 'POST',
+            });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                console.log(data.message);
+            } else {
+                // Clear cart data before clearing user data
+                if (userId) {
+                    localStorage.removeItem(`cart_${userId}`);
+                }
+                
+                // Dispatch signout action and navigate
+                dispatch(signoutSuccess());
+                navigate(`/`);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
 
-  return (
-    <header className="fixed w-full z-50">
-      <Navbar fluid className="bg-purple-900 border-b border-amber-400 shadow-lg px-4 py-2">
-        <Navbar.Brand as={Link} to="/">
-          <img
-            src="/logo.svg"
-            className="mr-3 h-10"
-            alt="Wedding Planner Logo"
-          />
-          <span className="self-center whitespace-nowrap text-xl font-semibold text-white">
-            <span className="text-amber-400">Wedding</span> Planner
-          </span>
-        </Navbar.Brand>
-        
-        <div className="flex md:order-2">
-          {isLoggedIn ? (
-            <Dropdown
-              arrowIcon={false}
-              inline
-              label={
-                <Avatar alt="User settings" img="/user-avatar.png" rounded className="border-2 border-amber-400" />
-              }
-            >
-              <Dropdown.Header>
-                <span className="block text-sm">Welcome back!</span>
-                <span className="block truncate text-sm font-medium">
-                  {userRole && `Logged in as ${userRole}`}
-                </span>
-              </Dropdown.Header>
-              <Link to="/dashboard">
-                <Dropdown.Item>Dashboard</Dropdown.Item>
-              </Link>
-              <Link to="/profile">
-                <Dropdown.Item>Profile</Dropdown.Item>
-              </Link>
-              {userRole === 'Service Provider' && (
-                <Link to="/services/manage">
-                  <Dropdown.Item>Manage Services</Dropdown.Item>
-                </Link>
-              )}
-              {userRole === 'Property Owner' && (
-                <Link to="/properties/manage">
-                  <Dropdown.Item>Manage Properties</Dropdown.Item>
-                </Link>
-              )}
-              <Dropdown.Divider />
-              <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
-            </Dropdown>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-white hover:text-amber-300 flex items-center"
-              >
-                <FaSignInAlt className="mr-2" /> Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center transition duration-300 shadow-md"
-              >
-                <FaUserPlus className="mr-2" /> Register
-              </Link>
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set('searchTerm', searchTerm);
+        const searchQuery = urlParams.toString();
+        navigate(`/search?${searchQuery}`);
+    };
+
+    return (
+        <header className={` shadow-md relative bg-gradient-to-r from-[#9e4f80] to-[#a73278]`}>
+            <div className="flex items-center justify-between p-6 mx-auto max-w-7xl">
+            <Link to="/">
+    <img src={logo} alt="logo" className="h-12 w-auto max-w-[80px]" />
+</Link>
+
+                
+
+                <ul className="flex items-center gap-10"> {/* Aligning items in the center */}
+                    <Link to="/">
+                        <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+                            Home
+                        </li>
+                    </Link>
+                    <Link to="/about">
+                        <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+                            About
+                        </li>
+                    </Link>
+                    {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
+        <Link to="/">
+            <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+                Properties
+            </li>
+        </Link>
+
+    )}
+                    {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
+
+<Link to="/">
+<li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+    Services
+</li>
+</Link>
+    )}
+
+{!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
+
+<Link to="/">
+<li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+    Advertisement
+</li>
+</Link>
+    )}
+
+                </ul>
+
+                <div className='flex gap-4'> {/* Sign-in dropdown or button */}
+                    {currentUser ? (
+                        <Dropdown
+                            arrowIcon={false}
+                            inline
+                            label={
+                                <Avatar alt='user' img={currentUser.profilePicture} rounded />
+                            }
+                        >
+                            <Dropdown.Header>
+                                <span className='block text-sm'>@{currentUser.username}</span>
+                                <span className='block text-sm font-medium truncate'>
+                                    {currentUser.email}
+                                </span>
+                            </Dropdown.Header>
+                            <Link to={'/Dashboard?tab=profile'}>
+                                <Dropdown.Item>Profile</Dropdown.Item>
+                            </Link>
+                            <DropdownDivider />
+                            <Dropdown.Item onClick={handleSignout}> Signout</Dropdown.Item>
+                        </Dropdown>
+                    ) : (
+                        <Link to='/signin'>
+                            <button className='px-4 py-2 text-white bg-red-900 rounded'>
+                                Sign In
+                            </button>
+                        </Link>
+                    )}
+                </div>
             </div>
-          )}
-          <Navbar.Toggle className="ml-3 text-white" />
-        </div>
-        
-        <Navbar.Collapse>
-          {navLinks.map((link) => (
-            <Navbar.Link
-              key={link.path}
-              as={Link}
-              to={link.path}
-              active={location.pathname === link.path}
-              className={`${
-                location.pathname === link.path
-                  ? 'text-amber-400'
-                  : 'text-gray-200 hover:text-amber-300'
-              } text-base font-medium`}
-            >
-              {link.name}
-            </Navbar.Link>
-          ))}
-        </Navbar.Collapse>
-      </Navbar>
-    </header>
-  );
-};
-
-export default Header;
+        </header>
+    );
+}

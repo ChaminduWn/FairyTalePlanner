@@ -19,55 +19,55 @@ const HomePage = () => {
 
     const services = [
         { 
-          icon: <FaHotel className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaHotel className="mb-4 text-4xl text-purple-600" />, 
           title: 'Hotels & Venues', 
           description: 'Find the perfect venue for your special day.',
           url: '/about'
         },
         { 
-          icon: <FaCamera className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaCamera className="mb-4 text-4xl text-purple-600" />, 
           title: 'Photography', 
           description: 'Capture every moment with professional photographers.',
           url: '/services/photography'
         },
         { 
-          icon: <FaFemale className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaFemale className="mb-4 text-4xl text-purple-600" />, 
           title: 'Bridal Services', 
           description: 'Complete bridal packages for your perfect look.',
           url: '/services/bridal'
         },
         { 
-          icon: <FaUserTie className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaUserTie className="mb-4 text-4xl text-purple-600" />, 
           title: 'Groom Services', 
           description: 'Dressing and grooming services for grooms.',
           url: '/services/groom'
         },
         { 
-          icon: <FaCar className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaCar className="mb-4 text-4xl text-purple-600" />, 
           title: 'Car Rentals', 
           description: 'Luxury vehicles to travel in style.',
           url: '/services/car-rental'
         },
         { 
-          icon: <FaMapMarkerAlt className="text-4xl text-purple-600 mb-4" />, 
+          icon: <FaMapMarkerAlt className="mb-4 text-4xl text-purple-600" />, 
           title: 'Photo Locations', 
           description: 'Scenic spots for memorable wedding photos.',
           url: '/services/photo-locations'
         },
         { 
-            icon: <FaMusic className="text-4xl text-purple-600 mb-4" />, 
+            icon: <FaMusic className="mb-4 text-4xl text-purple-600" />, 
             title: 'Entertainment Services', 
             description: 'Music and performances for your special celebration.',
             url: '/services/entertainment'
           },
           { 
-            icon: <FaGift className="text-4xl text-purple-600 mb-4" />, 
+            icon: <FaGift className="mb-4 text-4xl text-purple-600" />, 
             title: 'Invitation & Gift Services', 
             description: 'Beautiful invitations and creative gift solutions.',
             url: '/services/invitations-gifts'
           },
           { 
-            icon: <FaPlane className="text-4xl text-purple-600 mb-4" />, 
+            icon: <FaPlane className="mb-4 text-4xl text-purple-600" />, 
             title: 'Honeymoon', 
             description: 'Plan your perfect honeymoon getaway.',
             url: '/services/honeymoon'
@@ -76,40 +76,29 @@ const HomePage = () => {
 
   return (
     <div className="font-sans">
-      {/* Header with pink banner */}
-      <div className="bg-pink-500 text-white text-center text-xs py-1">
-        Celebrate love with our special packages - Book your date today!
-      </div>
-      
+     
    
       
       {/* Hero Section */}
       <div className="w-full h-screen bg-[linear-gradient(to_right_bottom,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('./assets/home2.jpg')] bg-center bg-cover">
         {/* Hero Image */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/api/placeholder/1920/1080" 
-            alt="Wedding couple" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black opacity-20"></div>
-        </div>
+       
         
         {/* Overlay Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-white">
           <div className="text-center">
-            <h1 className="text-4xl md:text-7xl font-script mb-4">
-              {/* <span className="font-light italic"> Welcome to Dreams</span> */}
+            <h1 className="mb-4 text-4xl md:text-7xl font-script">
+              {/* <span className="italic font-light"> Welcome to Dreams</span> */}
               {/* <span className="text-pink-400"> Welcome to Dreams</span> */}
-              <span className="font-normal italic">Welcome to Dreams</span>
+              <span className="italic font-normal">Welcome to Dreams</span>
             </h1>
-            <p className="text-xl md:text-2xl font-light italic mb-8">- Plan the perfect wedding -</p>
+            <p className="mb-8 text-xl italic font-light md:text-2xl">- Plan the perfect wedding -</p>
             <div className="flex justify-center py-10">
               <Link to="/budget-tracker">
                 <Button
                   gradientDuoTone="pinkToOrange"
                   size="lg"
-                  className="px-8 py-3 flex justify-center rounded-full text-xl font-semibold shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                  className="flex justify-center px-8 py-3 text-xl font-semibold transition-transform duration-300 ease-in-out rounded-full shadow-lg hover:scale-105"
                 >
                   Plan Your Wedding with your budget
                 </Button>
@@ -121,28 +110,28 @@ const HomePage = () => {
 
       {/* Services Section */}
             <section className="py-16 bg-white">
-              <div className="container mx-auto px-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-center text-purple-600 mb-4">
+              <div className="container px-4 mx-auto">
+                <h2 className="mb-4 text-3xl font-bold text-center text-purple-600 md:text-4xl">
                   Our <span className="text-purple-600">Services</span>
                 </h2>
-                <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                <p className="max-w-2xl mx-auto mb-12 text-center text-gray-600">
                   Discover all the wedding services available on our platform to make your special day perfect.
                 </p>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                   {services.map((service, index) => (
                     <Card 
                       key={index} 
-                      className="hover:shadow-xl transition-shadow duration-300 border border-pink-200"
+                      className="transition-shadow duration-300 border border-pink-200 hover:shadow-xl"
                     >
-                      <div className="text-center p-4">
+                      <div className="p-4 text-center">
                         {service.icon}
-                        <h3 className="text-xl font-semibold text-pink-900 mb-2">{service.title}</h3>
-                        <p className="text-gray-600 mb-4">{service.description}</p>
+                        <h3 className="mb-2 text-xl font-semibold text-pink-900">{service.title}</h3>
+                        <p className="mb-4 text-gray-600">{service.description}</p>
                         <div className="flex justify-center">
   <Link to={service.url}>
-  <Button className="bg-pink-600 text-white hover:bg-pink-800">
-  Explore <FaArrowRight className="ml-2 mt-1" />
+  <Button className="text-white bg-pink-600 hover:bg-pink-800">
+  Explore <FaArrowRight className="mt-1 ml-2" />
 </Button>
   </Link>
 </div>
@@ -151,7 +140,7 @@ const HomePage = () => {
                   ))}
                 </div>
                 
-                <div className="text-center mt-12">
+                <div className="mt-12 text-center">
                   <Link to="/services">
                     <Button size="xl" gradientDuoTone="pinkToBlue">
                       View All Services
@@ -161,11 +150,11 @@ const HomePage = () => {
               </div>
             </section>
       
-      <div className="container mx-auto py-16 px-4 text-center">
-        <h2 className="text-2xl font-light uppercase tracking-wide mb-2">View our best services</h2>
-        <div className="w-24 h-1 bg-pink-400 mx-auto mb-12"></div>
+      <div className="container px-4 py-16 mx-auto text-center">
+        <h2 className="mb-2 text-2xl font-light tracking-wide uppercase">View our best services</h2>
+        <div className="w-24 h-1 mx-auto mb-12 bg-pink-400"></div>
         
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <p className="text-gray-600">Our work has been featured in MICHAEL & JOURNEY's wedding ceremony</p>
         </div>
         
@@ -174,8 +163,8 @@ const HomePage = () => {
       </div>
       
       {/* Footer */}
-      <footer className="bg-gray-100 py-8">
-        <div className="container mx-auto px-4 text-center">
+      <footer className="py-8 bg-gray-100">
+        <div className="container px-4 mx-auto text-center">
           <p className="text-gray-600">© 2025 Dreams Wedding Planning. All Rights Reserved.</p>
           <div className="flex justify-center mt-4 space-x-4">
             <a href="#" className="text-pink-500 hover:text-pink-700">
