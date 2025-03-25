@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, Spinner, Badge, Toast } from "flowbite-react";
 import { FaEye, FaTrash, FaCheck, FaTimes, FaEdit, FaArrowRight, FaMapMarkerAlt, FaPhone, FaEnvelope, FaDollarSign } from "react-icons/fa";
 import { TextInput, Textarea, Select, Label, FileInput } from "flowbite-react";
-import axios from "axios"; // Make sure axios is installed
-import homeImage from "../assets/home.jpg"; // Add this line
+import axios from "axios";
+import homeImage from "../assets/home.jpg";
 
 const AdminDashAdvertisment = () => {
   const [advertisements, setAdvertisements] = useState([]);
@@ -12,6 +12,8 @@ const AdminDashAdvertisment = () => {
   const [selectedAd, setSelectedAd] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredAds, setFilteredAds] = useState([]);
   
   // Form state for editing
   const [title, setTitle] = useState("");
@@ -53,6 +55,22 @@ const AdminDashAdvertisment = () => {
   useEffect(() => {
     fetchAdvertisements();
   }, []);
+  
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredAds(advertisements);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = advertisements.filter(ad => 
+        ad.title.toLowerCase().includes(query) ||
+        ad.description.toLowerCase().includes(query) ||
+        ad.location.toLowerCase().includes(query) ||
+        ad.email.toLowerCase().includes(query) ||
+        ad.category.toLowerCase().includes(query)
+      );
+      setFilteredAds(filtered);
+    }
+  }, [searchQuery, advertisements]);
   
   const handleViewAd = (ad) => {
     setSelectedAd(ad);
@@ -179,6 +197,34 @@ const AdminDashAdvertisment = () => {
     <div className="p-4 bg-gray-900 text-white">
       <h2 className="text-2xl font-semibold mb-4 text-pink-300">Advertisement Management</h2>
       
+      {/* Search bar */}
+      <div className="mb-4 flex">
+        <div className="relative w-full md:w-1/3">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+          </div>
+          <input
+            type="search"
+            className="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg block w-full ps-10 p-2.5"
+            placeholder="Search advertisements..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              className="absolute inset-y-0 end-0 flex items-center pe-3"
+              onClick={() => setSearchQuery("")}
+            >
+              <svg className="w-4 h-4 text-gray-400 hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+      
       {error && (
         <div className="bg-red-800 text-white p-3 rounded-lg mb-4">
           {error}
@@ -199,23 +245,31 @@ const AdminDashAdvertisment = () => {
             </tr>
           </thead>
           <tbody>
-            {advertisements.map((ad) => (
-              <tr key={ad.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
-                <td className="px-4 py-3 text-white font-medium">{ad.title}</td>
-                <td className="px-4 py-3 text-gray-300">{new Date(ad.date).toLocaleDateString()}</td>
-                <td className="px-4 py-3">{getStatusBadge(ad.status)}</td>
-                <td className="px-4 py-3">
-                  <div className="flex space-x-2">
-                    <Button size="xs" className="bg-indigo-700 hover:bg-indigo-900" onClick={() => handleViewAd(ad)}>
-                      <FaEye className="mr-2" /> View
-                    </Button>
-                    <Button size="xs" className="bg-red-700 hover:bg-red-900" onClick={() => handleDelete(ad.id)}>
-                      <FaTrash className="mr-2" /> Delete
-                    </Button>
-                  </div>
+            {filteredAds.length > 0 ? (
+              filteredAds.map((ad) => (
+                <tr key={ad.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
+                  <td className="px-4 py-3 text-white font-medium">{ad.title}</td>
+                  <td className="px-4 py-3 text-gray-300">{new Date(ad.date).toLocaleDateString()}</td>
+                  <td className="px-4 py-3">{getStatusBadge(ad.status)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex space-x-2">
+                      <Button size="xs" className="bg-indigo-700 hover:bg-indigo-900" onClick={() => handleViewAd(ad)}>
+                        <FaEye className="mr-2" /> View
+                      </Button>
+                      <Button size="xs" className="bg-red-700 hover:bg-red-900" onClick={() => handleDelete(ad.id)}>
+                        <FaTrash className="mr-2" /> Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr className="bg-gray-800">
+                <td colSpan="4" className="px-4 py-6 text-center text-gray-400">
+                  No advertisements found matching your search.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

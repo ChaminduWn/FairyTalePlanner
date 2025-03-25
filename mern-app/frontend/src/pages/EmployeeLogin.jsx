@@ -58,7 +58,7 @@ export default function EmployeeLogin() {
       {/* Right Login Form */}
       <div className="w-full md:w-1/2 h-screen bg-[#1f1f1f] flex flex-col p-20 justify-center">
         <div className="w-full flex flex-col max-w-[550px] mx-auto">
-          <h1 className="text-2xl font-normal text-[#d4d4d4] my-8">Foods and Restaurants</h1>
+          <h1 className="text-2xl font-normal text-[#d4d4d4] my-8"> Dreams - Your wedding plans solution</h1>
           <h3 className="text-4xl font-semibold mb-4 text-[#d4d4d4]">Login</h3>
           <p className="text-base mb-2 text-[#d4d4d4]">Welcome Back! Please enter your details</p>
 
