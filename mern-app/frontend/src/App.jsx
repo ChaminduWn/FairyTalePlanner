@@ -15,7 +15,7 @@ import SignUp from "./pages/SignUp.jsx";
 
 function App() {
   return (
-    <BrowserRouter>
+    
 
     <Router basename="/">
       <Header />
@@ -42,7 +42,7 @@ function App() {
       </Routes>
       <Footer />
     </Router>
-    </BrowserRouter>
+    
   );
 }
 

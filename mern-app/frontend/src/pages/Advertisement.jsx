@@ -18,6 +18,7 @@ import {
 import { Link } from "react-router-dom";
 import PostAdvertismentModal from "../components/PostAdvertismentModal";
 import homeImage from "../assets/home.jpg";
+const BACKEND_URL = "http://localhost:4000";
 
 
 const Advertisement = () => {
