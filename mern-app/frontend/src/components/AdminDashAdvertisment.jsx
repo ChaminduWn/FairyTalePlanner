@@ -57,20 +57,18 @@ const AdminDashAdvertisment = () => {
   }, []);
   
   useEffect(() => {
-    if (searchQuery.trim() === "") {
+    if (!searchQuery.trim()) {
       setFilteredAds(advertisements);
-    } else {
-      const query = searchQuery.toLowerCase();
-      const filtered = advertisements.filter(ad => 
-        ad.title.toLowerCase().includes(query) ||
-        ad.description.toLowerCase().includes(query) ||
-        ad.location.toLowerCase().includes(query) ||
-        ad.email.toLowerCase().includes(query) ||
-        ad.category.toLowerCase().includes(query)
-      );
-      setFilteredAds(filtered);
+      return;
     }
+    const query = searchQuery.toLowerCase();
+    setFilteredAds(advertisements.filter(ad => 
+      ["title", "description", "location", "email", "category"].some(key =>
+        ad[key]?.toLowerCase().includes(query)
+      )
+    ));
   }, [searchQuery, advertisements]);
+  
   
   const handleViewAd = (ad) => {
     setSelectedAd(ad);
