@@ -96,13 +96,12 @@ export default function Header() {
     )}
 
 {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
-
-<Link to="/">
-<li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
-    Advertisement
-</li>
-</Link>
-    )}
+            <Link to="/advertisement">
+              <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+                Advertisement
+              </li>
+            </Link>
+          )}
 
                 </ul>
 

@@ -9,21 +9,28 @@ import EmployeeLogin from "./pages/EmployeeLogin.jsx";
 import AdminPrivateRoute from "./components/AdminPrivateRoutes.jsx";
 import AdminDashboard from "./pages/AdminDashborad.jsx";
 import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx";
+import Advertisement from "./pages/Advertisement.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
 
 function App() {
   return (
+    
+
     <Router basename="/">
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/budget-tracker" element={<BudgetTracker />} />
+        <Route path="/header" element={<Header />} />
+        <Route path="/footer" element={<Footer />} />
         <Route path="/about" element={<About />} />
         <Route path="/location-map" element={<LocationMap />} />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/advertisement" element={<Advertisement />} />
+
 
         <Route element={<AdminPrivateRoute />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
@@ -35,6 +42,7 @@ function App() {
       </Routes>
       <Footer />
     </Router>
+    
   );
 }
 
