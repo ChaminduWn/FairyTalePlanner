@@ -3,6 +3,8 @@ import BudgetTracker from "./pages/BudgetTracker.jsx";
 import Home from "./pages/Home.jsx";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
+import Dashboard from "./pages/DashBoard.jsx";
+
 import About from "./pages/About.jsx";
 import LocationMap from "./pages/LocationMap.jsx";
 import EmployeeLogin from "./pages/EmployeeLogin.jsx";
@@ -12,6 +14,9 @@ import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx"
 import Advertisement from "./pages/Advertisement.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
+import DashBoard from "./pages/DashBoard.jsx";
+import MemberView from "./pages/MemberView.jsx";
+import PrivateRoute from "./components/PrivateRoute.jsx";
 
 function App() {
   return (
@@ -21,6 +26,8 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<DashBoard />} />
+
         <Route path="/budget-tracker" element={<BudgetTracker />} />
         <Route path="/header" element={<Header />} />
         <Route path="/footer" element={<Footer />} />
@@ -32,12 +39,22 @@ function App() {
         <Route path="/advertisement" element={<Advertisement />} />
 
 
+
+
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/member-view/:userId" element={<MemberView />} />
+        </Route>
+
         <Route element={<AdminPrivateRoute />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route
             path="/view-employee-details/:empId"
             element={<AdminViewEmployeeDetails />}
           />
+
+<Route path="/member-view/:userId" element={<MemberView />} />
+
         </Route>
       </Routes>
       <Footer />
