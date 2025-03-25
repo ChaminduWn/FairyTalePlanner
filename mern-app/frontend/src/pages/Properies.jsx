@@ -1,107 +1,102 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Tag, Star } from 'lucide-react';
 
-// Expanded dummy services data
-const servicesData = [
+// Expanded dummy properties data
+const propertiesData = [
   {
     id: 1,
-    name: "Magical Wedding Photography",
-    location: "Colombo",
-    price: 1500,
-    category: "Photography",
+    name: "Tropical Beach Resort",
+    location: "Bentota",
+    price: 250,
+    category: "Hotels",
     image: "/api/placeholder/400/300",
-    description: "Professional wedding photography with artistic storytelling",
-    contactNumber: "+94 77 987 6543",
-    email: "shoot@magicalweddings.com",
-    rating: 4.8,
-    tags: ["Candid", "Traditional", "Destination"]
+    description: "Luxurious beachfront resort with stunning ocean views and wedding facilities",
+    contactNumber: "+94 34 567 8901",
+    email: "reservations@tropicalbeach.com",
+    rating: 4.9,
+    tags: ["Beachfront", "Luxury", "All-Inclusive"]
   },
   {
     id: 2,
-    name: "Royal Bridal Couture",
-    location: "Kandy",
-    price: 2000,
-    category: "Bridal Service",
+    name: "Romantic Hill Country Retreat",
+    location: "Nuwara Eliya",
+    price: 300,
+    category: "Honeymoon",
     image: "/api/placeholder/400/300",
-    description: "Exquisite wedding dress design and rental services",
-    contactNumber: "+94 81 234 5678",
-    email: "royalbridal@wedding.com",
-    rating: 4.9,
-    tags: ["Designer", "Custom", "Luxury"]
+    description: "Secluded mountain escape perfect for romantic honeymoon experiences",
+    contactNumber: "+94 52 345 6789",
+    email: "bookings@hillretreat.com",
+    rating: 4.8,
+    tags: ["Mountain", "Scenic", "Private"]
   },
   {
     id: 3,
-    name: "Scenic Wedding Locations",
+    name: "Historic Colonial Villa",
     location: "Galle",
-    price: 1200,
-    category: "Photo Location",
+    price: 350,
+    category: "Photo Locations",
     image: "/api/placeholder/400/300",
-    description: "Breathtaking venues for wedding photoshoots",
-    contactNumber: "+94 91 456 7890",
-    email: "locations@weddingspots.com",
+    description: "Breathtaking historic venue with picturesque gardens and architectural beauty",
+    contactNumber: "+94 91 234 5678",
+    email: "events@colonialvilla.com",
     rating: 4.7,
-    tags: ["Beach", "Garden", "Historic"]
+    tags: ["Historic", "Gardens", "Architectural"]
   },
   {
     id: 4,
-    name: "Groom's Style Haven",
+    name: "Luxury City Hotel",
     location: "Colombo",
-    price: 800,
-    category: "Groom Dressing",
+    price: 200,
+    category: "Hotels",
     image: "/api/placeholder/400/300",
-    description: "Tailored suits and complete groom styling",
-    contactNumber: "+94 77 654 3210",
-    email: "groomstyle@wedding.com",
+    description: "Modern urban hotel with world-class wedding and event facilities",
+    contactNumber: "+94 11 876 5432",
+    email: "weddings@cityhotel.com",
     rating: 4.6,
-    tags: ["Tailored", "Modern", "Classic"]
+    tags: ["Urban", "Modern", "Convenient"]
   },
   {
     id: 5,
-    name: "Luxury Wedding Cars",
-    location: "Gampaha",
-    price: 600,
-    category: "Car Rental",
+    name: "Exotic Island Honeymoon Package",
+    location: "Trincomalee",
+    price: 500,
+    category: "Honeymoon",
     image: "/api/placeholder/400/300",
-    description: "Elegant vintage and modern wedding car rentals",
-    contactNumber: "+94 32 987 6543",
-    email: "luxurycars@wedding.com",
-    rating: 4.5,
-    tags: ["Vintage", "Modern", "Luxury"]
+    description: "All-inclusive romantic getaway with private beach and luxury accommodations",
+    contactNumber: "+94 26 543 2109",
+    email: "honeymoon@exoticisland.com",
+    rating: 4.9,
+    tags: ["Private", "Exclusive", "All-Inclusive"]
   },
   {
     id: 6,
-    name: "Wedding Entertainment Experts",
-    location: "Colombo",
-    price: 1800,
-    category: "Entertainment Services",
+    name: "Botanical Garden Wedding Venue",
+    location: "Kandy",
+    price: 400,
+    category: "Photo Locations",
     image: "/api/placeholder/400/300",
-    description: "Complete wedding entertainment and event management",
-    contactNumber: "+94 11 234 5678",
-    email: "entertainment@weddingshow.com",
-    rating: 4.7,
-    tags: ["DJ", "Band", "MC"]
+    description: "Stunning botanical gardens with multiple picturesque wedding photo spots",
+    contactNumber: "+94 81 654 3210",
+    email: "bookings@botanicalgardens.com",
+    rating: 4.8,
+    tags: ["Natural", "Scenic", "Lush"]
   }
 ];
 
 // Dummy category images (replace with actual images)
 const categoryImages = {
-  "Photography": "/api/placeholder/1200/400",
-  "Bridal Service": "/api/placeholder/1200/400",
-  "Groom Dressing": "/api/placeholder/1200/400",
-  "Car Rental": "/api/placeholder/1200/400",
-  "Entertainment Services": "/api/placeholder/1200/400",
-  "Invitation & Gift Services": "/api/placeholder/1200/400"
+  "Hotels": "/api/placeholder/1200/400",
+  "Honeymoon": "/api/placeholder/1200/400",
+  "Photo Locations": "/api/placeholder/1200/400"
 };
 
-const ServicesPage = () => {
+const PropertiesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentCategoryCarousel, setCurrentCategoryCarousel] = useState(0);
 
   const categories = [
-    "Photography", "Bridal Service", 
-    "Groom Dressing", "Car Rental", "Entertainment Services", 
-    "Invitation & Gift Services"
+    "Hotels", "Honeymoon", "Photo Locations"
   ];
 
   // Category Carousel Auto-Swipe Effect
@@ -115,10 +110,10 @@ const ServicesPage = () => {
     return () => clearInterval(categoryCarouselInterval);
   }, [categories.length]);
 
-  // Filtering services based on search and category
-  const filteredServices = servicesData.filter(service => 
-    service.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedCategory ? service.category === selectedCategory : true)
+  // Filtering properties based on search and category
+  const filteredProperties = propertiesData.filter(property => 
+    property.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedCategory ? property.category === selectedCategory : true)
   );
 
   // Get current category for carousel
@@ -127,7 +122,7 @@ const ServicesPage = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-        Wedding Services
+        Wedding Properties
       </h1>
 
       {/* Category Carousel */}
@@ -171,7 +166,7 @@ const ServicesPage = () => {
           <Search className="ml-3 text-gray-500" />
           <input 
             type="text" 
-            placeholder="Search services..." 
+            placeholder="Search properties..." 
             className="p-3 w-full rounded-lg focus:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -179,52 +174,52 @@ const ServicesPage = () => {
         </div>
       </div>
 
-      {/* Services Grid Layout */}
+      {/* Properties Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {filteredServices.map(service => (
+        {filteredProperties.map(property => (
           <div 
-            key={service.id} 
+            key={property.id} 
             className="bg-white shadow-md rounded-lg overflow-hidden group transition-all duration-300 hover:shadow-lg hover:scale-105"
           >
-            {/* Service Image */}
+            {/* Property Image */}
             <div className="relative h-40 overflow-hidden">
               <img 
-                src={service.image} 
-                alt={service.name} 
+                src={property.image} 
+                alt={property.name} 
                 className="w-full h-full object-cover"
               />
               {/* Category Tag */}
               <span className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs">
-                {service.category}
+                {property.category}
               </span>
             </div>
 
-            {/* Service Details */}
+            {/* Property Details */}
             <div className="p-3">
-              {/* Service Name */}
+              {/* Property Name */}
               <h2 className="text-base font-semibold text-gray-800 mb-1 truncate">
-                {service.name}
+                {property.name}
               </h2>
 
               {/* Location and Price */}
               <div className="flex justify-between items-center mb-1">
                 <div className="flex items-center text-gray-600 text-sm">
                   <MapPin className="w-3 h-3 mr-1" />
-                  <span>{service.location}</span>
+                  <span>{property.location}</span>
                 </div>
                 <span className="font-bold text-primary text-sm">
-                  ${service.price}
+                  ${property.price}/night
                 </span>
               </div>
 
               {/* Description */}
               <p className="text-gray-500 text-xs mb-2 line-clamp-2">
-                {service.description}
+                {property.description}
               </p>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1 mb-2">
-                {service.tags.slice(0,2).map(tag => (
+                {property.tags.slice(0,2).map(tag => (
                   <span 
                     key={tag}
                     className="flex items-center bg-gray-100 text-gray-700 px-1 py-0.5 rounded-full text-[0.6rem]"
@@ -238,7 +233,7 @@ const ServicesPage = () => {
               {/* Rating */}
               <div className="flex items-center text-yellow-500 text-sm">
                 <Star className="w-4 h-4 mr-1" />
-                <span className="font-semibold">{service.rating}/5</span>
+                <span className="font-semibold">{property.rating}/5</span>
               </div>
             </div>
           </div>
@@ -248,4 +243,4 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage;
+export default PropertiesPage;
