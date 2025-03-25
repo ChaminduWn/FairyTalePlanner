@@ -63,7 +63,7 @@ const AdminDashAdvertisment = () => {
     }
     const query = searchQuery.toLowerCase();
     setFilteredAds(advertisements.filter(ad => 
-      ["title", "description", "location", "email", "category"].some(key =>
+      ["title"].some(key =>
         ad[key]?.toLowerCase().includes(query)
       )
     ));
