@@ -7,13 +7,13 @@ import AdminDasManagers from "../components/AdminDashManager.jsx";
 import DashUsers from "../components/DashUsers.jsx";
 import DashboardComponent from "../components/DashboardComponent.jsx";
 import SearchEmployee from "../components/SearchEmployee.jsx"; 
+import AdminDashAdvertisment from "../components/AdminDashAdvertisment.jsx";
 
 
 export default function AdminDashboard() {
   const location = useLocation();
   const [tab, setTab] = useState("");
   const [empId, setEmpId] = useState("");
-  const [foodCategoryId, setFoodCategoryId] = useState(""); // New state for food category ID
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -46,6 +46,8 @@ export default function AdminDashboard() {
           {tab === "addemployee" && <AdminDasAddEmp />}
           {tab === "profile" && <DashProfile />}
           {tab === "admin-managers" && <AdminDasManagers />}
+          {tab === "advertisement" && <AdminDashAdvertisment />}
+
 
        
 
