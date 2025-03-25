@@ -78,7 +78,7 @@ export default function AdminDashSideBar() {
             </div>
           </Link>
         )}
-        {/* {!currentUser.role && (
+        {!currentUser.role && (
           <Link to="/admin-dashboard?tab=member-profile">
             <div
               className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
@@ -89,7 +89,7 @@ export default function AdminDashSideBar() {
               <span className="text-[15px] ml-4 text-[#D4D4D4]">Profile</span>
             </div>
           </Link>
-        )} */}
+        )}
    
        {currentUser?.role === "Manager" && (
         <>
