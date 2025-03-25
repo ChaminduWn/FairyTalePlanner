@@ -312,23 +312,23 @@ const AdminDashAdvertisment = () => {
                       </div>
 
                       <div className="absolute bottom-6 left-0 right-0 text-sm bg-black bg-opacity-60 py-3 px-4 rounded-lg">
-                        <div className="flex items-start text-white mb-2">
+                        <div className="flex items-start mb-2">
                           <FaDollarSign className="mr-2 mt-1" />
                           <span><strong>Starting from</strong> {selectedAd.price}</span>
                         </div>
                         
                         <div className="space-y-1">
-                          <div className="flex items-start text-white">
+                          <div className="flex items-start ">
                             <FaMapMarkerAlt className="mr-2 mt-1" />
                             <span>{selectedAd.location}</span>
                           </div>
                           
-                          <div className="flex items-start text-white">
+                          <div className="flex items-start">
                             <FaPhone className="mr-2 mt-1" />
                             <span>{selectedAd.contactNumber}</span>
                           </div>
                           
-                          <div className="flex items-start text-white">
+                          <div className="flex items-start ">
                             <FaEnvelope className="mr-2 mt-1" />
                             <span>{selectedAd.email}</span>
                           </div>
@@ -366,8 +366,8 @@ const AdminDashAdvertisment = () => {
                         onChange={(e) => setDescription(e.target.value)}
                         required
                         rows={5}
-                        className="bg-gray-700 border-gray-600"
-                        style={{ color: 'white' }}
+                        className="bg-white border-gray-600"
+                        // style={{ color: 'white' }}
                         placeholder="Enter description..."
                       />
                     </div>
@@ -381,8 +381,8 @@ const AdminDashAdvertisment = () => {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="bg-gray-700 border-gray-600"
-                        style={{ color: 'white' }}
+                        className="bg-white border-gray-600"
+                        // style={{ color: 'white' }}
                       >
                         <option value="" disabled style={{ color: 'black' }}>Select a category</option>
                         <option value="Venues" style={{ color: 'black' }}>Venues</option>
@@ -404,8 +404,8 @@ const AdminDashAdvertisment = () => {
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
                         required
-                        className="bg-gray-700 border-gray-600"
-                        style={{ color: 'white' }}
+                        className="bg-white border-gray-600"
+                        // style={{ color: 'white' }}
                         placeholder="Enter location..."
                       />
                     </div>
@@ -420,8 +420,8 @@ const AdminDashAdvertisment = () => {
                           value={contactNumber}
                           onChange={(e) => setContactNumber(e.target.value)}
                           required
-                          className="bg-gray-700 border-gray-600"
-                          style={{ color: 'white' }}
+                          className="bg-white border-gray-600"
+                          // style={{ color: 'white' }}
                           placeholder="Phone number..."
                         />
                       </div>
