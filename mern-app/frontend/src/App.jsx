@@ -9,6 +9,7 @@ import EmployeeLogin from "./pages/EmployeeLogin.jsx";
 import AdminPrivateRoute from "./components/AdminPrivateRoutes.jsx";
 import AdminDashboard from "./pages/AdminDashborad.jsx";
 import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx";
+import Advertisement from "./pages/Advertisement.jsx";
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
           <Route path="/about" element={<About/>} />
           <Route path="/location-map" element={<LocationMap/>} />
           <Route path="/employee-login" element={<EmployeeLogin />} />
+          <Route path="/advertisement" element={<Advertisement />} />
+
 
 
           {/* <Route path="/budget-tracker" element={<BudgetTracker />} /> */}
