@@ -274,7 +274,7 @@ const AdminDashAdvertisment = () => {
       
       {/* View/Edit Modal */}
       <Modal show={viewModalOpen} onClose={() => setViewModalOpen(false)} size="6xl">
-        <Modal.Header className="bg-[#3a1d4d] h-[60px] rounded-t-[10px] text-white">
+        <Modal.Header className="h-[60px] rounded-t-[10px] text-white">
           Advertisement Details
         </Modal.Header>
         <Modal.Body className="max-h-[76vh] bg-[#2d2d2d] text-white">
