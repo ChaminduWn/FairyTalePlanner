@@ -8,6 +8,8 @@ import BudgetRoutes from './routes/budgetRoutes.js';
 import LocationsRoutes from './routes/locationsRoutes.js';
 import authEmployeeRoutes from './routes/authEmployee.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
 
@@ -35,10 +37,13 @@ app.listen(4000, () => {
 });
 
 // Routes
+
 app.use("/api/budget", BudgetRoutes);
 app.use("/api/location", LocationsRoutes);
 app.use("/api/employee", employeeRoutes);  
 app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 // ✅ FIXED: Global Error Handler
 app.use((err, req, res, next) => {
