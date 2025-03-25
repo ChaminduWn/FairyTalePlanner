@@ -105,35 +105,31 @@ export default function Header() {
 
                 </ul>
 
-                <div className='flex gap-4'> {/* Sign-in dropdown or button */}
-                    {currentUser ? (
-                        <Dropdown
-                            arrowIcon={false}
-                            inline
-                            label={
-                                <Avatar alt='user' img={currentUser.profilePicture} rounded />
-                            }
-                        >
-                            <Dropdown.Header>
-                                <span className='block text-sm'>@{currentUser.username}</span>
-                                <span className='block text-sm font-medium truncate'>
-                                    {currentUser.email}
-                                </span>
-                            </Dropdown.Header>
-                            <Link to={'/Dashboard?tab=profile'}>
-                                <Dropdown.Item>Profile</Dropdown.Item>
-                            </Link>
-                            <DropdownDivider />
-                            <Dropdown.Item onClick={handleSignout}> Signout</Dropdown.Item>
-                        </Dropdown>
-                    ) : (
-                        <Link to='/signin'>
-                            <button className='px-4 py-2 text-white bg-red-900 rounded'>
-                                Sign In
-                            </button>
-                        </Link>
-                    )}
-                </div>
+                <div className='flex gap-4'> {/* Sign-in/Sign-up section */}
+    {currentUser ? (
+        <Dropdown arrowIcon={false} inline label={<Avatar alt='user' img={currentUser.profilePicture} rounded />}>
+            <Dropdown.Header>
+                <span className='block text-sm'>@{currentUser.username}</span>
+                <span className='block text-sm font-medium truncate'>{currentUser.email}</span>
+            </Dropdown.Header>
+            <Link to={'/Dashboard?tab=profile'}>
+                <Dropdown.Item>Profile</Dropdown.Item>
+            </Link>
+            <DropdownDivider />
+            <Dropdown.Item onClick={handleSignout}>Signout</Dropdown.Item>
+        </Dropdown>
+    ) : (
+        <div className="flex gap-2"> 
+            <Link to='/Signin'>
+                <button className='px-4 py-2 text-white bg-red-900 rounded'>
+                    Sign In
+                </button>
+            </Link>
+            
+        </div>
+    )}
+</div>
+
             </div>
         </header>
     );
