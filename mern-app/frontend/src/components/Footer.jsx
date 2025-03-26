@@ -11,13 +11,13 @@ import {
   FaMapMarkerAlt 
 } from 'react-icons/fa';
 
-const appFooter = () => {
+const AppFooter = () => {
   return (
-    <Footer container className="bg-purple-900 text-white border-t border-amber-400">
-      <div className="w-full max-w-7xl mx-auto">
-        <div className="grid w-full grid-cols-1 gap-8 py-8 px-6 md:grid-cols-4">
+    <Footer container className="text-whitebg-gradient-to-r from-[#AC5180] to-[#160121] border-t border-amber-400">
+      <div className="w-full mx-auto max-w-7xl">
+        <div className="grid w-full grid-cols-1 gap-8 px-6 py-8 md:grid-cols-4">
           <div>
-            <Footer.Title title="Wedding Planner" className="text-amber-400 text-xl mb-4" />
+            <Footer.Title title="Wedding Planner" className="mb-4 text-xl text-amber-400" />
             <Footer.LinkGroup col>
               <p className="mb-3 text-gray-300">
                 Your one-stop destination for planning the perfect wedding. From venues to services, we've got you covered!
@@ -80,7 +80,7 @@ const appFooter = () => {
           </div>
         </div>
         
-        <div className="w-full bg-purple-950 py-4 px-6 border-t border-gray-700 text-center">
+        <div className="w-full px-6 py-4 text-center bg-purple-700 border-t border-gray-700">
           <span className="text-sm text-gray-300">
             © {new Date().getFullYear()} Wedding Planner. All Rights Reserved.
           </span>
@@ -90,4 +90,4 @@ const appFooter = () => {
   );
 };
 
-export default appFooter;
+export default AppFooter;

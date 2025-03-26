@@ -159,6 +159,17 @@ export default function AdminDashSideBar() {
               </div>
             </Link>
 
+            <Link to="/admin-dashboard?tab=Add-Locations">
+              <div
+                className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                  activeTab === "Add-Locations" ? "bg-[#707070]" : ""
+                }`}
+              >
+                <MdDashboard color="#D4D4D4" />
+                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Add-Locations</span>
+              </div>
+            </Link>
+
             
             {dropdowns.isOpenEmp && (
               <div className="text-left text-sm font-light w-4/5 mx-auto text-[#D4D4D4] p-2">

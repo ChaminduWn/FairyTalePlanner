@@ -17,6 +17,7 @@ import SignUp from "./pages/SignUp.jsx";
 import DashBoard from "./pages/DashBoard.jsx";
 import MemberView from "./pages/MemberView.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
+import LocationMapView from "./pages/LocationMapView.jsx";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
         <Route path="/footer" element={<Footer />} />
         <Route path="/about" element={<About />} />
         <Route path="/location-map" element={<LocationMap />} />
+        <Route path="/location-view" element={<LocationMapView />} />
+
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />

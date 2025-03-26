@@ -45,9 +45,9 @@ export default function Header() {
 
     return (
         <header className="border-b-2 border-b-black shadow-md relative bg-gradient-to-r from-[#AC5180] to-[#160121] z-50">
-            <div className="flex items-center justify-between p-6 mx-auto max-w-7xl relative">
+            <div className="relative flex items-center justify-between p-6 mx-auto max-w-7xl">
             <Link to="/">
-                    <img src={logo} alt="logo" className="w-40" />
+                    <img src={logo} alt="logo" className="w-auto h-12 max-w-[80px]" />
                 </Link>
                 
                 <ul className="flex items-center gap-10">
@@ -61,13 +61,7 @@ export default function Header() {
                             About
                         </li>
                     </Link>
-                    {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
-                        <Link to="/item">
-                            <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
-                                Item
-                            </li>
-                        </Link>
-                    )}
+                   
                     {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
                         <Link to="/properties">
                             <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
@@ -89,9 +83,16 @@ export default function Header() {
                             </li>
                         </Link>
                     )}
+                    {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
+                        <Link to="/">
+                            <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
+                                Locations
+                            </li>
+                        </Link>
+                    )}
                 </ul>
                 
-                <div className='flex gap-4 relative z-50'>
+                <div className='relative z-50 flex gap-4'>
                     {currentUser ? (
                         <Dropdown
                             arrowIcon={false}
