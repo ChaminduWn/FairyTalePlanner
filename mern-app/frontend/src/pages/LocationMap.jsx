@@ -43,7 +43,7 @@ function LocationMap() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/locations');
+        const response = await fetch('/api/location');
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -81,7 +81,7 @@ function LocationMap() {
   // Save new location
   const handleSaveLocation = async () => {
     try {
-      const response = await fetch('/api/locations', {
+      const response = await fetch('/api/location', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +249,9 @@ function LocationMap() {
       </div>
       
       {/* Google Map Component */}
-      <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+      <LoadScript googleMapsApiKey="AIzaSyBxwUZXzqzRJ6UgwCIcNFIMSV5LurxF314">
+      {/* <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}> */}
+
         <GoogleMap 
           mapContainerStyle={mapContainerStyle}
           center={center}
