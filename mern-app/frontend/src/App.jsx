@@ -11,6 +11,10 @@ import EmployeeLogin from "./pages/EmployeeLogin.jsx";
 import AdminPrivateRoute from "./components/AdminPrivateRoutes.jsx";
 import AdminDashboard from "./pages/AdminDashborad.jsx";
 import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx";
+import Services from "./pages/Services.jsx";
+import PropertiesPage from "./pages/Properies.jsx";
+import UploadPage from "./pages/Prop&serviceUpload.jsx";
+import ManagementDashboard from "./pages/Management.jsx";
 import Advertisement from "./pages/Advertisement.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import SignUp from "./pages/SignUp.jsx";
@@ -22,6 +26,7 @@ function App() {
   return (
     
 
+       
     <Router basename="/">
       <Header />
       <Routes>
@@ -37,6 +42,10 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/advertisement" element={<Advertisement />} />
+        <Route path="/services" element={<Services/>} />
+          <Route path="/properties" element={<PropertiesPage/>} />
+          <Route path="/upload" element={<UploadPage/>} />
+          <Route path="/management-dashboard" element={<ManagementDashboard/>} />
 
 
 
