@@ -103,15 +103,15 @@ const UploadPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="container mx-auto p-6 bg-purple-50 min-h-screen">
       <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+        <h1 className="text-4xl font-bold text-center mb-8 text-purple-800">
           List Your Wedding Service or Property
         </h1>
 
         {/* Upload Type Selector */}
         <div className="mb-6">
-          <label className="block text-gray-700 font-bold mb-2">
+          <label className="block text-purple-700 font-bold mb-2">
             What are you listing?
           </label>
           <div className="flex justify-center space-x-4">
@@ -120,8 +120,8 @@ const UploadPage = () => {
               onClick={() => setUploadType('service')}
               className={`px-6 py-3 rounded-lg transition-all flex items-center ${
                 uploadType === 'service' 
-                  ? 'bg-primary text-white' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-purple-600 text-white' 
+                  : 'bg-purple-200 text-purple-700 hover:bg-purple-300'
               }`}
             >
               <Upload className="mr-2" /> Service
@@ -131,8 +131,8 @@ const UploadPage = () => {
               onClick={() => setUploadType('property')}
               className={`px-6 py-3 rounded-lg transition-all flex items-center ${
                 uploadType === 'property' 
-                  ? 'bg-primary text-white' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-purple-600 text-white' 
+                  : 'bg-purple-200 text-purple-700 hover:bg-purple-300'
               }`}
             >
               <MapPin className="mr-2" /> Property
@@ -146,7 +146,7 @@ const UploadPage = () => {
             {/* Basic Information */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Business/Property Name
                 </label>
                 <input
@@ -154,13 +154,13 @@ const UploadPage = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter name"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Location
                 </label>
                 <input
@@ -168,7 +168,7 @@ const UploadPage = () => {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="City/Region"
                   required
                 />
@@ -178,14 +178,14 @@ const UploadPage = () => {
             {/* Category and Price */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Category
                 </label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                 >
                   <option value="">Select Category</option>
@@ -197,7 +197,7 @@ const UploadPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Price
                 </label>
                 <input
@@ -205,7 +205,7 @@ const UploadPage = () => {
                   name="price"
                   value={formData.price}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter price"
                   required
                 />
@@ -214,14 +214,14 @@ const UploadPage = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-gray-700 mb-2">
+              <label className="block text-purple-700 mb-2">
                 Description
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Provide detailed description"
                 rows="4"
                 required
@@ -230,7 +230,7 @@ const UploadPage = () => {
 
             {/* Tags */}
             <div>
-              <label className="block text-gray-700 mb-2">
+              <label className="block text-purple-700 mb-2">
                 Tags
               </label>
               <div className="flex mb-2">
@@ -238,13 +238,13 @@ const UploadPage = () => {
                   type="text"
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
-                  className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Add tags"
                 />
                 <button
                   type="button"
                   onClick={addTag}
-                  className="bg-primary text-white px-4 rounded-r-lg hover:bg-opacity-90"
+                  className="bg-purple-600 text-white px-4 rounded-r-lg hover:bg-purple-700"
                 >
                   <Plus />
                 </button>
@@ -253,13 +253,13 @@ const UploadPage = () => {
                 {formData.tags.map(tag => (
                   <span 
                     key={tag} 
-                    className="flex items-center bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"
+                    className="flex items-center bg-purple-200 text-purple-700 px-2 py-1 rounded-full text-sm"
                   >
                     {tag}
                     <button 
                       type="button"
                       onClick={() => removeTag(tag)}
-                      className="ml-2 text-red-500"
+                      className="ml-2 text-amber-500"
                     >
                       <X size={16} />
                     </button>
@@ -271,7 +271,7 @@ const UploadPage = () => {
             {/* Contact Information */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Contact Number
                 </label>
                 <input
@@ -279,13 +279,13 @@ const UploadPage = () => {
                   name="contactNumber"
                   value={formData.contactNumber}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Your contact number"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-purple-700 mb-2">
                   Email Address
                 </label>
                 <input
@@ -293,7 +293,7 @@ const UploadPage = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Your email address"
                   required
                 />
@@ -302,11 +302,11 @@ const UploadPage = () => {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-gray-700 mb-2">
+              <label className="block text-purple-700 mb-2">
                 Upload Images
               </label>
               <div 
-                className="border-2 border-dashed border-gray-300 p-6 text-center rounded-lg"
+                className="border-2 border-dashed border-purple-300 p-6 text-center rounded-lg"
                 onClick={() => fileInputRef.current.click()}
               >
                 <input
@@ -318,12 +318,12 @@ const UploadPage = () => {
                   className="hidden"
                 />
                 <div className="flex justify-center mb-4">
-                  <Camera className="text-gray-400 w-12 h-12" />
+                  <Camera className="text-purple-400 w-12 h-12" />
                 </div>
-                <p className="text-gray-600">
+                <p className="text-purple-600">
                   Click to upload or drag and drop images
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-purple-500 mt-2">
                   PNG, JPG, WEBP up to 10MB
                 </p>
               </div>
@@ -344,7 +344,7 @@ const UploadPage = () => {
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 bg-amber-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X size={16} />
                       </button>
@@ -358,7 +358,7 @@ const UploadPage = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-opacity-90 transition-all flex items-center justify-center mx-auto"
+                className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-all flex items-center justify-center mx-auto"
               >
                 <CheckCircle className="mr-2" /> Upload Listing
               </button>

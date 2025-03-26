@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Tag, Star } from 'lucide-react';
+import tropical from '../assets/tropical.jpg';
+import hillCountry from '../assets/hillcountry.jpg';
+import luxury from '../assets/luxury.jpg';
+import historic from '../assets/historic.avif';
+import honeymoon from '../assets/honeymoon.webp';
+import botanical from '../assets/botanical.webp';
 
 // Expanded dummy properties data
 const propertiesData = [
@@ -9,7 +15,7 @@ const propertiesData = [
     location: "Bentota",
     price: 250,
     category: "Hotels",
-    image: "/api/placeholder/400/300",
+    image: tropical,
     description: "Luxurious beachfront resort with stunning ocean views and wedding facilities",
     contactNumber: "+94 34 567 8901",
     email: "reservations@tropicalbeach.com",
@@ -22,7 +28,7 @@ const propertiesData = [
     location: "Nuwara Eliya",
     price: 300,
     category: "Honeymoon",
-    image: "/api/placeholder/400/300",
+    image: hillCountry,
     description: "Secluded mountain escape perfect for romantic honeymoon experiences",
     contactNumber: "+94 52 345 6789",
     email: "bookings@hillretreat.com",
@@ -35,7 +41,7 @@ const propertiesData = [
     location: "Galle",
     price: 350,
     category: "Photo Locations",
-    image: "/api/placeholder/400/300",
+    image: historic,
     description: "Breathtaking historic venue with picturesque gardens and architectural beauty",
     contactNumber: "+94 91 234 5678",
     email: "events@colonialvilla.com",
@@ -48,7 +54,7 @@ const propertiesData = [
     location: "Colombo",
     price: 200,
     category: "Hotels",
-    image: "/api/placeholder/400/300",
+    image: luxury,
     description: "Modern urban hotel with world-class wedding and event facilities",
     contactNumber: "+94 11 876 5432",
     email: "weddings@cityhotel.com",
@@ -61,7 +67,7 @@ const propertiesData = [
     location: "Trincomalee",
     price: 500,
     category: "Honeymoon",
-    image: "/api/placeholder/400/300",
+    image: honeymoon,
     description: "All-inclusive romantic getaway with private beach and luxury accommodations",
     contactNumber: "+94 26 543 2109",
     email: "honeymoon@exoticisland.com",
@@ -74,7 +80,7 @@ const propertiesData = [
     location: "Kandy",
     price: 400,
     category: "Photo Locations",
-    image: "/api/placeholder/400/300",
+    image: botanical,
     description: "Stunning botanical gardens with multiple picturesque wedding photo spots",
     contactNumber: "+94 81 654 3210",
     email: "bookings@botanicalgardens.com",
@@ -121,12 +127,12 @@ const PropertiesPage = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+      <h1 className="text-4xl font-bold text-center mb-8 text-purple-800">
         Wedding Properties
       </h1>
 
       {/* Category Carousel */}
-      <div className="mb-8 w-80%">
+      <div className="mr-8 ml-8 mb-8 w-80%">
         <div 
           key={currentCategory}
           className="relative cursor-pointer transform transition-all hover:scale-105"
@@ -137,7 +143,7 @@ const PropertiesPage = () => {
             alt={currentCategory} 
             className="w-70% h-[200px] object-cover rounded-xl shadow-md"
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-center p-4 rounded-b-xl">
+          <div className="absolute bottom-0 left-0 right-0 bg-purple-500 bg-opacity-50 text-white text-center p-4 rounded-b-xl">
             <span className="text-2xl font-bold">{currentCategory}</span>
           </div>
         </div>
@@ -151,8 +157,8 @@ const PropertiesPage = () => {
             onClick={() => setSelectedCategory(category)}
             className={`px-4 py-2 rounded-full transition-all ${
               selectedCategory === category 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-purple-600 text-white' 
+                : 'bg-purple-200 text-purple-700 hover:bg-purple-300'
             }`}
           >
             {category}
@@ -163,7 +169,7 @@ const PropertiesPage = () => {
       {/* Search Input */}
       <div className="flex justify-center mb-8">
         <div className="flex items-center bg-white shadow-md rounded-lg w-full max-w-md">
-          <Search className="ml-3 text-gray-500" />
+          <Search className="ml-3 text-purple-500" />
           <input 
             type="text" 
             placeholder="Search properties..." 
@@ -189,7 +195,7 @@ const PropertiesPage = () => {
                 className="w-full h-full object-cover"
               />
               {/* Category Tag */}
-              <span className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs">
+              <span className="absolute top-2 right-2 bg-purple-600 text-white px-2 py-1 rounded-full text-xs">
                 {property.category}
               </span>
             </div>
@@ -197,23 +203,23 @@ const PropertiesPage = () => {
             {/* Property Details */}
             <div className="p-3">
               {/* Property Name */}
-              <h2 className="text-base font-semibold text-gray-800 mb-1 truncate">
+              <h2 className="text-base font-semibold text-purple-800 mb-1 truncate">
                 {property.name}
               </h2>
 
               {/* Location and Price */}
               <div className="flex justify-between items-center mb-1">
-                <div className="flex items-center text-gray-600 text-sm">
+                <div className="flex items-center text-amber-600 text-sm">
                   <MapPin className="w-3 h-3 mr-1" />
                   <span>{property.location}</span>
                 </div>
-                <span className="font-bold text-primary text-sm">
+                <span className="font-bold text-amber-600 text-sm">
                   ${property.price}/night
                 </span>
               </div>
 
               {/* Description */}
-              <p className="text-gray-500 text-xs mb-2 line-clamp-2">
+              <p className="text-purple-700 text-opacity-70 text-xs mb-2 line-clamp-2">
                 {property.description}
               </p>
 
@@ -222,7 +228,7 @@ const PropertiesPage = () => {
                 {property.tags.slice(0,2).map(tag => (
                   <span 
                     key={tag}
-                    className="flex items-center bg-gray-100 text-gray-700 px-1 py-0.5 rounded-full text-[0.6rem]"
+                    className="flex items-center bg-purple-100 text-purple-700 px-1 py-0.5 rounded-full text-[0.6rem]"
                   >
                     <Tag className="w-2 h-2 mr-0.5" />
                     {tag}
@@ -231,7 +237,7 @@ const PropertiesPage = () => {
               </div>
 
               {/* Rating */}
-              <div className="flex items-center text-yellow-500 text-sm">
+              <div className="flex items-center text-amber-500 text-sm">
                 <Star className="w-4 h-4 mr-1" />
                 <span className="font-semibold">{property.rating}/5</span>
               </div>

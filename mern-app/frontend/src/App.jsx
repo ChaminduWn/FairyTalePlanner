@@ -12,6 +12,7 @@ import AdminViewEmployeeDetails from "./components/AdminViewEmployeeDetails.jsx"
 import Services from "./pages/Services.jsx";
 import PropertiesPage from "./pages/Properies.jsx";
 import UploadPage from "./pages/Prop&serviceUpload.jsx";
+import ManagementDashboard from "./pages/Management.jsx";
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/services" element={<Services/>} />
           <Route path="/properties" element={<PropertiesPage/>} />
           <Route path="/upload" element={<UploadPage/>} />
+          <Route path="/management-dashboard" element={<ManagementDashboard/>} />
           <Route path="/location-map" element={<LocationMap/>} />
           <Route path="/employee-login" element={<EmployeeLogin />} />
 
