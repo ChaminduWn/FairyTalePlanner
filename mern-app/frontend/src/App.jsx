@@ -26,8 +26,6 @@ import LocationMapView from "./pages/LocationMapView.jsx";
 function App() {
   return (
     
-
-       
     <Router basename="/">
       <Header />
       <Routes>
@@ -49,8 +47,6 @@ function App() {
           <Route path="/properties" element={<PropertiesPage/>} />
           <Route path="/upload" element={<UploadPage/>} />
           <Route path="/management-dashboard" element={<ManagementDashboard/>} />
-
-
 
 
         <Route element={<PrivateRoute />}>

@@ -132,21 +132,18 @@ export default function AdminDashSideBar() {
 
             
 
-            {/* Employee Management */}
-            <div
-              className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
-                activeTab === "emp" ? "bg-[#707070]" : ""
-              }`}
-              onClick={() => toggleDropdown("isOpenEmp")}
-            >
-              <HiOutlineUserGroup color="#D4D4D4" />
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[15px] ml-4 text-[#D4D4D4]">Employees</span>
-                <span className="text-sm">
-                  {dropdowns.isOpenEmp ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                </span>
+            
+
+            <Link to="/admin-dashboard?tab=Property-service">
+              <div
+                className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                  activeTab === "Property-service" ? "bg-[#707070]" : ""
+                }`}
+              >
+                <MdDashboard color="#D4D4D4" />
+                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Service Management </span>
               </div>
-            </div>
+            </Link>
 
             <Link to="/admin-dashboard?tab=advertisement">
               <div
@@ -169,6 +166,23 @@ export default function AdminDashSideBar() {
                 <span className="text-[15px] ml-4 text-[#D4D4D4]"> Add-Locations</span>
               </div>
             </Link>
+            
+
+            {/* Employee Management */}
+            <div
+              className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                activeTab === "emp" ? "bg-[#707070]" : ""
+              }`}
+              onClick={() => toggleDropdown("isOpenEmp")}
+            >
+              <HiOutlineUserGroup color="#D4D4D4" />
+              <div className="flex items-center justify-between w-full">
+                <span className="text-[15px] ml-4 text-[#D4D4D4]">Employees</span>
+                <span className="text-sm">
+                  {dropdowns.isOpenEmp ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                </span>
+              </div>
+            </div>
 
             
             {dropdowns.isOpenEmp && (
