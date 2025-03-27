@@ -174,7 +174,7 @@ function LocationMapView() {
             <p className="mb-2 text-sm text-gray-700">Click on the map to set location coordinates or enter them manually.</p>
             
             <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
-              <div>
+              {/* <div>
                 <label className="block mb-1 text-sm font-medium text-gray-900">Name</label>
                 <input 
                   type="text" 
@@ -192,9 +192,9 @@ function LocationMapView() {
                   value={newLocation.address}
                   onChange={(e) => setNewLocation({...newLocation, address: e.target.value})}
                 />
-              </div>
+              </div> */}
               
-              <div>
+              {/* <div>
                 <label className="block mb-1 text-sm font-medium text-gray-900">Category</label>
                 <select 
                   className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -205,7 +205,7 @@ function LocationMapView() {
                     <option key={category.name} value={category.name}>{category.name}</option>
                   ))}
                 </select>
-              </div>
+              </div> */}
               
               <div className="grid grid-cols-2 gap-2">
                 <div>
@@ -229,7 +229,7 @@ function LocationMapView() {
               </div>
             </div>
             
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               <button 
                 className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
                 onClick={handleSaveLocation}
@@ -243,7 +243,7 @@ function LocationMapView() {
               >
                 Cancel
               </button>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import Header from "./Header";
 import AdminDashSideBar from "./AdminDashSideBar";
 import EmployeeContact from "./EmployeeContact";
 import jsPDF from "jspdf";
@@ -56,7 +55,6 @@ export default function AdminViewEmployeeDetails() {
   };
   return (
     <>
-      <Header />
       <div className="min-h-screen flex flex-col md:flex-row bg-[#d4d4d4]" id="employeeDetails">
         <div className="md:w-56">
           <AdminDashSideBar />
