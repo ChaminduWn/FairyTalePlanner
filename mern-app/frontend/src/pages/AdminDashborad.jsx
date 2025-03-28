@@ -51,6 +51,7 @@ export default function AdminDashboard() {
           {tab === "advertisement" && <AdminDashAdvertisment />}
           {tab === "Add-Locations" && <LocationMap />}     
           {tab === "Property-service" && <ManagementDashboard />}       
+
   
 
 

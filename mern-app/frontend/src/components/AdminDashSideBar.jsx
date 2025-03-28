@@ -1,7 +1,10 @@
 import {
   HiArrowSmRight,
   HiUser,
+  HiUsers,
   HiOutlineUserGroup,
+  HiLocationMarker,
+  HiPresentationChartBar,
 } from "react-icons/hi";
 import {
   MdDashboard,
@@ -122,7 +125,7 @@ export default function AdminDashSideBar() {
                   activeTab === "admin-users" ? "bg-[#707070]" : ""
                 }`}
                >
-                <MdDashboard color="#D4D4D4" />
+                <HiUsers color="#D4D4D4" />
                 <span className="text-[15px] ml-4 text-[#D4D4D4]"> Users</span>
               </div>
               </Link>     
@@ -151,7 +154,7 @@ export default function AdminDashSideBar() {
                   activeTab === "advertisement" ? "bg-[#707070]" : ""
                 }`}
               >
-                <MdDashboard color="#D4D4D4" />
+                <HiPresentationChartBar color="#D4D4D4" />
                 <span className="text-[15px] ml-4 text-[#D4D4D4]"> Advertisment</span>
               </div>
             </Link>
@@ -162,7 +165,7 @@ export default function AdminDashSideBar() {
                   activeTab === "Add-Locations" ? "bg-[#707070]" : ""
                 }`}
               >
-                <MdDashboard color="#D4D4D4" />
+                <HiLocationMarker color="#D4D4D4" />
                 <span className="text-[15px] ml-4 text-[#D4D4D4]"> Add-Locations</span>
               </div>
             </Link>
