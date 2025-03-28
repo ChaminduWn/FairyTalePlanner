@@ -159,21 +159,21 @@ function LocationMapView() {
         ))}
       </div>
       
-      {/* Add Location Controls */}
+      {/* Add Location Controls
       <div className="mb-6">
         {!isAddingLocation ? (
           <button 
             className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
             onClick={() => setIsAddingLocation(true)}
           >
-            Add New Location
+            view coordinates
           </button>
         ) : (
           <div className="p-4 bg-gray-100 rounded">
-            <h3 className="mb-3 font-bold">Add New Location</h3>
+            <h3 className="mb-3 font-bold">   view coordinates    </h3>
             <p className="mb-2 text-sm text-gray-700">Click on the map to set location coordinates or enter them manually.</p>
             
-            <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2"> */}
               {/* <div>
                 <label className="block mb-1 text-sm font-medium text-gray-900">Name</label>
                 <input 
@@ -207,7 +207,7 @@ function LocationMapView() {
                 </select>
               </div> */}
               
-              <div className="grid grid-cols-2 gap-2">
+              {/* <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-900">Latitude</label>
                   <input 
@@ -228,7 +228,7 @@ function LocationMapView() {
                 </div>
               </div>
             </div>
-            
+             */}
             {/* <div className="flex gap-2">
               <button 
                 className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
@@ -244,9 +244,9 @@ function LocationMapView() {
                 Cancel
               </button>
             </div> */}
-          </div>
+          {/* </div>
         )}
-      </div>
+      </div> */}
       
       {/* Google Map Component */}
       <LoadScript googleMapsApiKey="AIzaSyBxwUZXzqzRJ6UgwCIcNFIMSV5LurxF314">

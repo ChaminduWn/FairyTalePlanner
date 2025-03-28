@@ -84,7 +84,7 @@ export default function Header() {
                         </Link>
                     )}
                     {!(currentUser?.role === "Manager" || currentUser?.isAdmin) && (
-                        <Link to="/">
+                        <Link to="location-view">
                             <li className="hidden sm:inline text-[#D4D4D4] hover:underline hover:underline-offset-4 hover:text-white">
                                 Locations
                             </li>
