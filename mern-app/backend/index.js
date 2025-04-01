@@ -8,10 +8,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import BudgetRoutes from './routes/budgetRoutes.js';
-import LocationsRoutes from './routes/locationsRoutes.js';
 import authEmployeeRoutes from './routes/authEmployee.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 import advertisment from './routes/advertismentRoutes.js';
+import LocationsRoutes, { adminRouter as LocationsAdminRoutes } from './routes/location.routes.js';
 
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
@@ -57,13 +57,21 @@ app.listen(4000, () => {
 // Routes
 
 app.use("/api/budget", BudgetRoutes);
-app.use("/api/location", LocationsRoutes);
+// app.use("/api/location", LocationsRoutes);
 app.use("/api/employee", employeeRoutes);  
 app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
 app.use("/api/advertisement", advertisment);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+
+// In index.js, add this line
+
+// Then in your route definitions section:
+app.use("/api/location", LocationsRoutes);
+app.use("/api/admin", LocationsAdminRoutes); // Add this line
+
+
 
 // ✅ FIXED: Global Error Handler
 app.use((err, req, res, next) => {

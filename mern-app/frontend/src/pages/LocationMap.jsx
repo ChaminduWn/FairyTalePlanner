@@ -38,8 +38,9 @@ function LocationMap() {
   });
   const [isAddingLocation, setIsAddingLocation] = useState(false);
   const [mapInstance, setMapInstance] = useState(null);
+  const [submitStatus, setSubmitStatus] = useState(null); // For showing submission status messages
 
-  // Fetch locations from backend
+  // Fetch locations from backend (only approved ones)
   useEffect(() => {
     const fetchLocations = async () => {
       try {
@@ -78,10 +79,10 @@ function LocationMap() {
     }
   };
 
-  // Save new location
-  const handleSaveLocation = async () => {
+  // Submit new location request (instead of directly saving)
+  const handleSubmitLocationRequest = async () => {
     try {
-      const response = await fetch('/api/location', {
+      const response = await fetch('/api/location/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,8 @@ function LocationMap() {
       }
       
       const data = await response.json();
-      setLocations([...locations, data]);
+      
+      // Reset form
       setNewLocation({
         name: "",
         address: "",
@@ -103,8 +105,24 @@ function LocationMap() {
         lng: ""
       });
       setIsAddingLocation(false);
+      
+      // Show success message
+      setSubmitStatus({
+        type: 'success',
+        message: 'Your location has been submitted for review. It will appear on the map after admin approval.'
+      });
+      
+      // Clear message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+      
     } catch (error) {
-      console.error("Error saving location:", error);
+      console.error("Error submitting location request:", error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'There was an error submitting your location. Please try again.'
+      });
     }
   };
 
@@ -129,6 +147,15 @@ function LocationMap() {
   return (
     <div className="container px-4 py-8 mx-auto">
       <h1 className="mb-6 text-3xl font-bold text-center">Wedding Service Locations</h1>
+      
+      {/* Status Message */}
+      {submitStatus && (
+        <div className={`p-4 mb-6 rounded ${
+          submitStatus.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {submitStatus.message}
+        </div>
+      )}
       
       {/* Category Filter */}
       <div className="mb-6">
@@ -170,8 +197,8 @@ function LocationMap() {
           </button>
         ) : (
           <div className="p-4 bg-gray-100 rounded">
-            <h3 className="mb-3 font-bold">Add New Location</h3>
-            <p className="mb-2 text-sm text-gray-700">Click on the map to set location coordinates or enter them manually.</p>
+            <h3 className="mb-3 font-bold">Suggest New Location</h3>
+            <p className="mb-2 text-sm text-gray-700">Your suggestion will be reviewed by an administrator before appearing on the map.</p>
             
             <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
               <div>
@@ -232,10 +259,10 @@ function LocationMap() {
             <div className="flex gap-2">
               <button 
                 className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
-                onClick={handleSaveLocation}
+                onClick={handleSubmitLocationRequest}
                 disabled={!newLocation.name || !newLocation.category || !newLocation.lat || !newLocation.lng}
               >
-                Save Location
+                Submit for Review
               </button>
               <button 
                 className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700"
@@ -250,8 +277,6 @@ function LocationMap() {
       
       {/* Google Map Component */}
       <LoadScript googleMapsApiKey="AIzaSyBxwUZXzqzRJ6UgwCIcNFIMSV5LurxF314">
-      {/* <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}> */}
-
         <GoogleMap 
           mapContainerStyle={mapContainerStyle}
           center={center}

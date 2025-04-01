@@ -90,6 +90,20 @@ export default function DashSideBar() {
                 </Link>
               )}
 
+{!currentUser?.isAdmin && ( // Ensure currentUser is defined before checking isAdmin
+                <Link to='/dashboard?tab=location'>
+                  <Sidebar.Item
+                    active={tab === 'location'}
+                    icon={HiOutlineUserGroup}
+                    as='div'
+                    className={`hover:bg-gray-700 ${tab === 'users' ? 'bg-gray-800' : ''}`}
+                    style={itemStyle}
+                  >
+                    location
+                  </Sidebar.Item>
+                </Link>
+              )}
+
               <Sidebar.Item
                 className='cursor-pointer hover:bg-red-700'
                 onClick={handleSignout}

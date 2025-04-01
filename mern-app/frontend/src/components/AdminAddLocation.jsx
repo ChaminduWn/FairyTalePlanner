@@ -1,7 +1,6 @@
 // LocationMap.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import { useNavigate } from "react-router-dom";
 
 const categories = [
   { name: "Photography", color: "#FF5733", icon: "📷" },
@@ -25,8 +24,7 @@ const center = {
   lng: 80.7718
 };
 
-function LocationMapView() {
-  const navigate = useNavigate();
+function AdminAddLocation() {
   const [locations, setLocations] = useState([]);
   const [filteredLocations, setFilteredLocations] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
@@ -131,15 +129,6 @@ function LocationMapView() {
   return (
     <div className="container px-4 py-8 mx-auto">
       <h1 className="mb-6 text-3xl font-bold text-center">Wedding Service Locations</h1>
-
-      <div className="flex justify-end p-4">
-      <button
-        className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
-        onClick={() => navigate("/location-map")}
-      >
-        Add your Service Location
-      </button>
-    </div>
       
       {/* Category Filter */}
       <div className="mb-6">
@@ -169,7 +158,95 @@ function LocationMapView() {
           </div>
         ))}
       </div>
-     
+      
+      {/* Add Location Controls
+      <div className="mb-6">
+        {!isAddingLocation ? (
+          <button 
+            className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+            onClick={() => setIsAddingLocation(true)}
+          >
+            view coordinates
+          </button>
+        ) : (
+          <div className="p-4 bg-gray-100 rounded">
+            <h3 className="mb-3 font-bold">   view coordinates    </h3>
+            <p className="mb-2 text-sm text-gray-700">Click on the map to set location coordinates or enter them manually.</p>
+            
+            <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2"> */}
+              {/* <div>
+                <label className="block mb-1 text-sm font-medium text-gray-900">Name</label>
+                <input 
+                  type="text" 
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  value={newLocation.name}
+                  onChange={(e) => setNewLocation({...newLocation, name: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-900">Address</label>
+                <input 
+                  type="text" 
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  value={newLocation.address}
+                  onChange={(e) => setNewLocation({...newLocation, address: e.target.value})}
+                />
+              </div> */}
+              
+              {/* <div>
+                <label className="block mb-1 text-sm font-medium text-gray-900">Category</label>
+                <select 
+                  className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  value={newLocation.category}
+                  onChange={(e) => setNewLocation({...newLocation, category: e.target.value})}
+                >
+                  {categories.map((category) => (
+                    <option key={category.name} value={category.name}>{category.name}</option>
+                  ))}
+                </select>
+              </div> */}
+              
+              {/* <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-900">Latitude</label>
+                  <input 
+                    type="text" 
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    value={newLocation.lat}
+                    onChange={(e) => setNewLocation({...newLocation, lat: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-900">Longitude</label>
+                  <input 
+                    type="text" 
+                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    value={newLocation.lng}
+                    onChange={(e) => setNewLocation({...newLocation, lng: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+             */}
+            {/* <div className="flex gap-2">
+              <button 
+                className="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700"
+                onClick={handleSaveLocation}
+                disabled={!newLocation.name || !newLocation.category || !newLocation.lat || !newLocation.lng}
+              >
+                Save Location
+              </button>
+              <button 
+                className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-700"
+                onClick={() => setIsAddingLocation(false)}
+              >
+                Cancel
+              </button>
+            </div> */}
+          {/* </div>
+        )}
+      </div> */}
       
       {/* Google Map Component */}
       <LoadScript googleMapsApiKey="AIzaSyBxwUZXzqzRJ6UgwCIcNFIMSV5LurxF314">
@@ -223,4 +300,4 @@ function LocationMapView() {
   );
 }
 
-export default LocationMapView;
+export default AdminAddLocation;

@@ -8,8 +8,9 @@ import DashUsers from "../components/DashUsers.jsx";
 import DashboardComponent from "../components/DashboardComponent.jsx";
 import SearchEmployee from "../components/SearchEmployee.jsx"; 
 import AdminDashAdvertisment from "../components/AdminDashAdvertisment.jsx";
-import LocationMap from "./LocationMap.jsx";
+// import LocationMap from "./LocationMap.jsx";
 import ManagementDashboard from "./Management.jsx";
+import AdminLocationsDashboard from "../components/AdminLocationsDashboard.jsx";
 
 
 export default function AdminDashboard() {
@@ -49,7 +50,7 @@ export default function AdminDashboard() {
           {tab === "profile" && <DashProfile />}
           {tab === "admin-managers" && <AdminDasManagers />}
           {tab === "advertisement" && <AdminDashAdvertisment />}
-          {tab === "Add-Locations" && <LocationMap />}     
+          {tab === "admin-Locations" && <AdminLocationsDashboard />}     
           {tab === "Property-service" && <ManagementDashboard />}       
 
   

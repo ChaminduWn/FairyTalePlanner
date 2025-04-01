@@ -1,32 +1,22 @@
-import mongoose from "mongoose";
+// models/location.model.js
+import mongoose from 'mongoose';
 
 const locationSchema = new mongoose.Schema({
+  userId:{
+    type : String,
+    required : true
+  },
   name: {
     type: String,
-    required: true,
-    trim: true,
-    default: 'No Name',
-
+    required: true
   },
   address: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   category: {
     type: String,
-    required: true,
-    enum: [
-      "Photography", 
-      "Bridal Service", 
-      "Photo Location", 
-      "Groom Dressing", 
-      "Car Rental", 
-      "Entertainment Services", 
-      "Invitation & Gift Services", 
-      "Honeymoon",
-      "Hotel"
-    ]
+    required: true
   },
   lat: {
     type: String,
@@ -36,12 +26,33 @@ const locationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  createdAt: {
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  requestedBy: {
+    type: String,
+    default: 'anonymous'
+  },
+  requestDate: {
     type: Date,
     default: Date.now
+  },
+  reviewedBy: {
+    type: String,
+    default: null
+  },
+  reviewDate: {
+    type: Date,
+    default: null
+  },
+  reviewComments: {
+    type: String,
+    default: null
   }
 });
 
-const location = mongoose.model('Location', locationSchema);
+const Location = mongoose.model('Location', locationSchema);
 
-export default location;
+export default Location;
