@@ -1,28 +1,13 @@
 import Advertisment from "../models/advertismentModel.js";
 import asyncHandler from "express-async-handler";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Get current directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const postAdvertisment = asyncHandler(async (req, res) => {
   try {
-    const { title, description, category, location, contactNo, email, price, status } = req.body;
+    const { title, description, category, location, contactNo, email, price, image, status } = req.body;
 
     // Validate required fields
-    if (!title || !description || !category || !location || !contactNo || !email || !price) {
+    if (!title || !description || !category || !location || !contactNo || !email || !price || !image) {
       return res.status(400).json({ message: "Please fill all required fields" });
-    }
-
-    // Handle image upload
-    let imagePath = "";
-    if (req.file) {
-      imagePath = `/uploads/${req.file.filename}`;
-    } else {
-      return res.status(400).json({ message: "Image is required" });
     }
 
     // Create new advertisement
@@ -34,7 +19,7 @@ const postAdvertisment = asyncHandler(async (req, res) => {
       contactNo: Number(contactNo),
       email,
       price: Number(price),
-      image: imagePath,
+      image, // This is now the Firebase URL
       status: status || "Pending",
       // postedBy: req.user._id,
     });
@@ -149,25 +134,12 @@ const updateAdvertismentStatus = asyncHandler(async (req, res) => {
 
 const updateAdvertisment = asyncHandler(async (req, res) => {
   try {
-    const { title, description, category, location, contactNo, email, price } = req.body;
+    const { title, description, category, location, contactNo, email, price, image } = req.body;
     
     const advertisment = await Advertisment.findById(req.params.id);
     
     if (!advertisment) {
       return res.status(404).json({ message: "Advertisement not found" });
-    }
-    
-    // Handle image upload if there's a new image
-    let imagePath = advertisment.image;
-    if (req.file) {
-      // Delete old image
-      if (advertisment.image) {
-        const oldImagePath = path.join(__dirname, '../', advertisment.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      imagePath = `/uploads/${req.file.filename}`;
     }
     
     // Update advertisement
@@ -178,7 +150,7 @@ const updateAdvertisment = asyncHandler(async (req, res) => {
     advertisment.contactNo = contactNo ? Number(contactNo) : advertisment.contactNo;
     advertisment.email = email || advertisment.email;
     advertisment.price = price ? Number(price) : advertisment.price;
-    advertisment.image = imagePath;
+    advertisment.image = image || advertisment.image; // Firebase URL
     
     const updatedAdvertisment = await advertisment.save();
     
@@ -201,14 +173,9 @@ const deleteAdvertisment = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Advertisement not found" });
     }
     
-    
-    // Delete image from server
-    if (advertisment.image) {
-      const imagePath = path.join(__dirname, '../', advertisment.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
+    // Note: Firebase image URLs should be deleted from Firebase storage
+    // This would require additional code using Firebase admin SDK
+    // We're just deleting the database record here
     
     await Advertisment.deleteOne({ _id: req.params.id });
     
