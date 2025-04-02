@@ -73,9 +73,8 @@ export default function SignUp() {
   };
 
   return (
-    <>
           
-    <div className='min-h-screen mt-20 bg-gray-100'> {/* Added background color */}
+    <div className='min-h-screen bg-gray-100'> {/* Added background color */}
       <div className="flex flex-col max-w-3xl gap-10 p-3 mx-auto md:flex-row md:items-center">
         {/* left */}
         <div className='flex-col hidden w-full mr-10 md:w-8/12 lg:w-6/12 md:flex'>
@@ -153,6 +152,5 @@ export default function SignUp() {
         </div>
       </div>
     </div>
-    </>
   );
 }

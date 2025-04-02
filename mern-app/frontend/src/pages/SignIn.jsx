@@ -49,12 +49,12 @@ export default function SignIn() {
   return (
 
     <>
-    <div className='min-h-screen mt-20 bg-gray-100'>
+    <div className='min-h-screen bg-gray-100'>
       <div className='flex flex-col max-w-3xl gap-10 p-3 mx-auto md:flex-row md:items-center'>
         
         {/* left */}
         <div className='flex-col hidden w-full mr-10 md:w-8/12 lg:w-6/12 md:flex'>
-          <img src={gymImage} alt="Gym" className='object-cover w-full h-full' />
+          <img src={gymImage} alt="login" className='object-cover w-full h-full' />
         </div>
 
         {/* right */}
