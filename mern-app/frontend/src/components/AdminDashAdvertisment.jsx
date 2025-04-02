@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Spinner, Badge, Toast } from "flowbite-react";
-import { FaEye, FaTrash, FaCheck, FaTimes, FaEdit, FaArrowRight, FaMapMarkerAlt, FaPhone, FaEnvelope, FaDollarSign } from "react-icons/fa";
+import { FaEye, FaTrash, FaCheck, FaTimes, FaEdit, FaArrowRight, FaMapMarkerAlt, FaPhone, FaEnvelope, FaDollarSign, FaExclamationCircle, FaCheckCircle } from "react-icons/fa";
 import { TextInput, Textarea, Select, Label, FileInput } from "flowbite-react";
 import axios from "axios";
-import homeImage from "../assets/home.jpg";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase"; // Import Firebase app instance
 
 const AdminDashAdvertisment = () => {
   const [advertisements, setAdvertisements] = useState([]);
@@ -16,14 +24,37 @@ const AdminDashAdvertisment = () => {
   const [filteredAds, setFilteredAds] = useState([]);
   
   // Form state for editing
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [price, setPrice] = useState("");
-  const [location, setLocation] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    price: "",
+    location: "",
+    contactNo: "",
+    email: "",
+    image: "",
+  });
+  
+  // Image handling states
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUploadProgress, setImageUploadProgress] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("error");
+  
+  // Show toast message
+  const displayToast = (message, type = "error") => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    // Auto hide after 3 seconds
+    setTimeout(() => setShowToast(false), 3000);
+  };
   
   // Fetch advertisements from API
   const fetchAdvertisements = async () => {
@@ -37,16 +68,18 @@ const AdminDashAdvertisment = () => {
         status: ad.status.toLowerCase(), 
         description: ad.description,
         category: ad.category,
-        price: `$${ad.price}`,
+        price: ad.price,
         location: ad.location,
-        contactNumber: ad.contactNo.toString(),
+        contactNo: ad.contactNo.toString(),
         email: ad.email,
-        imageUrl: `../../../backend/uploads/1742885812805-image (10).jpg`
+        image: ad.image
       }));
       setAdvertisements(formattedAds);
+      setFilteredAds(formattedAds);
     } catch (err) {
       console.error("Error fetching advertisements:", err);
       setError("Failed to load advertisements");
+      displayToast("Failed to load advertisements", "error");
     } finally {
       setLoading(false);
     }
@@ -63,12 +96,11 @@ const AdminDashAdvertisment = () => {
     }
     const query = searchQuery.toLowerCase();
     setFilteredAds(advertisements.filter(ad => 
-      ["title"].some(key =>
+      ["title", "category", "location"].some(key =>
         ad[key]?.toLowerCase().includes(query)
       )
     ));
   }, [searchQuery, advertisements]);
-  
   
   const handleViewAd = (ad) => {
     setSelectedAd(ad);
@@ -76,14 +108,18 @@ const AdminDashAdvertisment = () => {
     setShowEditForm(false);
     
     // Populate form fields for possible editing
-    setTitle(ad.title);
-    setDescription(ad.description);
-    setCategory(ad.category);
-    setPrice(ad.price);
-    setLocation(ad.location);
-    setContactNumber(ad.contactNumber);
-    setEmail(ad.email);
-    setImagePreview(ad.imageUrl);
+    setFormData({
+      title: ad.title,
+      description: ad.description,
+      category: ad.category,
+      price: ad.price,
+      location: ad.location,
+      contactNo: ad.contactNo,
+      email: ad.email,
+      image: ad.image
+    });
+    
+    setImagePreview(ad.image);
   };
   
   const handleDelete = async (id) => {
@@ -91,10 +127,12 @@ const AdminDashAdvertisment = () => {
       try {
         await axios.delete(`http://localhost:4000/api/advertisement/${id}`);
         // Refresh advertisements after deletion
+        displayToast("Advertisement deleted successfully", "success");
         fetchAdvertisements();
       } catch (err) {
         console.error("Error deleting advertisement:", err);
         setError("Failed to delete advertisement");
+        displayToast("Failed to delete advertisement", "error");
       }
     }
   };
@@ -107,11 +145,13 @@ const AdminDashAdvertisment = () => {
         ad.id === id ? {...ad, status: "approved"} : ad
       ));
       setViewModalOpen(false);
+      displayToast("Advertisement approved successfully", "success");
       // Refresh advertisements to get updated data
       fetchAdvertisements();
     } catch (err) {
       console.error("Error approving advertisement:", err);
       setError("Failed to approve advertisement");
+      displayToast("Failed to approve advertisement", "error");
     }
   };
   
@@ -123,48 +163,107 @@ const AdminDashAdvertisment = () => {
         ad.id === id ? {...ad, status: "rejected"} : ad
       ));
       setViewModalOpen(false);
+      displayToast("Advertisement rejected", "success");
       // Refresh advertisements to get updated data
       fetchAdvertisements();
     } catch (err) {
       console.error("Error rejecting advertisement:", err);
       setError("Failed to reject advertisement");
+      displayToast("Failed to reject advertisement", "error");
     }
   };
   
   const toggleEditForm = () => {
     setShowEditForm(!showEditForm);
+    setImageUploadProgress(null);
+    setImageUploading(false);
+    setImageUploadError(null);
+  };
+  
+  // Handle form field changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+  
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Upload image to Firebase when the image file changes
+  useEffect(() => {
+    if (imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
+  
+  const uploadImage = async () => {
+    setImageUploading(true);
+    setImageUploadError(null);
+    const storage = getStorage(app); // Firebase storage instance
+    const fileName = new Date().getTime() + imageFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageUploadProgress(progress.toFixed(0));
+      },
+      (error) => {
+        setImageUploadError("Error uploading image. Please try again.");
+        setImageUploadProgress(null);
+        setImageUploading(false);
+        displayToast("Error uploading image!", "error");
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setFormData((prev) => ({ ...prev, image: downloadURL }));
+        setImageUploading(false);
+        displayToast("Image uploaded successfully!", "success");
+      }
+    );
   };
   
   const handleUpdate = async () => {
     try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('description', description);
-      formData.append('category', category);
-      formData.append('price', price.replace('$', ''));
-      formData.append('location', location);
-      formData.append('contactNo', contactNumber);
-      formData.append('email', email);
-      
-      // If there's a new image file
-      const imageInput = document.getElementById('image');
-      if (imageInput && imageInput.files[0]) {
-        formData.append('image', imageInput.files[0]);
+      // Check if image is still uploading
+      if (imageUploading) {
+        displayToast("Please wait until the image is uploaded.");
+        return;
       }
       
-      await axios.put(`http://localhost:4000/api/advertisement/${selectedAd.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      // Prepare data for update
+      const updateData = { ...formData };
+      
+      // Remove $ from price if it exists
+      if (typeof updateData.price === 'string' && updateData.price.startsWith('$')) {
+        updateData.price = updateData.price.substring(1);
+      }
+      
+      await axios.put(`http://localhost:4000/api/advertisement/${selectedAd.id}`, updateData);
       
       // Close form and refresh data
+      displayToast("Advertisement updated successfully!", "success");
       setShowEditForm(false);
       setViewModalOpen(false);
       fetchAdvertisements();
     } catch (err) {
       console.error("Error updating advertisement:", err);
       setError("Failed to update advertisement");
+      displayToast("Failed to update advertisement", "error");
     }
   };
   
@@ -185,20 +284,39 @@ const AdminDashAdvertisment = () => {
   
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-gray-900">
         <Spinner size="xl" />
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-gray-900 text-white">
-      <h2 className="text-2xl font-semibold mb-4 text-pink-300">Advertisement Management</h2>
+    <div className="p-4 text-white bg-gray-900">
+      {/* Toast notification */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-[9999]">
+          <Toast className="shadow-lg">
+            <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg shrink-0">
+              {toastType === "error" ? (
+                <FaExclamationCircle className="w-5 h-5 text-red-500" />
+              ) : (
+                <FaCheckCircle className="w-5 h-5 text-green-500" />
+              )}
+            </div>
+            <div className="ml-3 text-sm font-normal">
+              {toastMessage}
+            </div>
+            <Toast.Toggle onDismiss={() => setShowToast(false)} />
+          </Toast>
+        </div>
+      )}
+      
+      <h2 className="mb-4 text-2xl font-semibold text-pink-300">Advertisement Management</h2>
       
       {/* Search bar */}
-      <div className="mb-4 flex">
+      <div className="flex mb-4">
         <div className="relative w-full md:w-1/3">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="absolute inset-y-0 flex items-center pointer-events-none start-0 ps-3">
             <svg className="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
             </svg>
@@ -212,7 +330,7 @@ const AdminDashAdvertisment = () => {
           />
           {searchQuery && (
             <button
-              className="absolute inset-y-0 end-0 flex items-center pe-3"
+              className="absolute inset-y-0 flex items-center end-0 pe-3"
               onClick={() => setSearchQuery("")}
             >
               <svg className="w-4 h-4 text-gray-400 hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -224,7 +342,7 @@ const AdminDashAdvertisment = () => {
       </div>
       
       {error && (
-        <div className="bg-red-800 text-white p-3 rounded-lg mb-4">
+        <div className="p-3 mb-4 text-white bg-red-800 rounded-lg">
           {error}
           <Button size="xs" className="ml-3" onClick={() => setError(null)}>
             Dismiss
@@ -233,20 +351,20 @@ const AdminDashAdvertisment = () => {
       )}
       
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-700">
+        <table className="w-full border border-collapse border-gray-700">
           <thead>
             <tr className="bg-gray-800">
-              <th className="px-4 py-3 text-left text-pink-400 font-semibold border-b border-gray-700">Title</th>
-              <th className="px-4 py-3 text-left text-pink-400 font-semibold border-b border-gray-700">Date</th>
-              <th className="px-4 py-3 text-left text-pink-400 font-semibold border-b border-gray-700">Status</th>
-              <th className="px-4 py-3 text-left text-pink-400 font-semibold border-b border-gray-700">Actions</th>
+              <th className="px-4 py-3 font-semibold text-left text-pink-400 border-b border-gray-700">Title</th>
+              <th className="px-4 py-3 font-semibold text-left text-pink-400 border-b border-gray-700">Date</th>
+              <th className="px-4 py-3 font-semibold text-left text-pink-400 border-b border-gray-700">Status</th>
+              <th className="px-4 py-3 font-semibold text-left text-pink-400 border-b border-gray-700">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredAds.length > 0 ? (
               filteredAds.map((ad) => (
-                <tr key={ad.id} className="bg-gray-800 hover:bg-gray-700 border-b border-gray-700">
-                  <td className="px-4 py-3 text-white font-medium">{ad.title}</td>
+                <tr key={ad.id} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700">
+                  <td className="px-4 py-3 font-medium text-white">{ad.title}</td>
                   <td className="px-4 py-3 text-gray-300">{new Date(ad.date).toLocaleDateString()}</td>
                   <td className="px-4 py-3">{getStatusBadge(ad.status)}</td>
                   <td className="px-4 py-3">
@@ -274,63 +392,65 @@ const AdminDashAdvertisment = () => {
       
       {/* View/Edit Modal */}
       <Modal show={viewModalOpen} onClose={() => setViewModalOpen(false)} size="6xl">
-        <Modal.Header className="h-[60px] rounded-t-[10px] text-white">
+        <Modal.Header className="bg-[#e8cfee] h-[60px] rounded-t-[10px]">
           Advertisement Details
         </Modal.Header>
-        <Modal.Body className="max-h-[76vh] bg-[#2d2d2d] text-white">
+        <Modal.Body className="max-h-[76vh] bg-[#d1cfd1]">
           {selectedAd && (
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex flex-col gap-6 md:flex-row">
               {/* Preview on the left */}
               <div className={`${showEditForm ? 'md:w-1/2' : 'w-full'} p-4 flex items-center justify-center`}>
-                <div className="bg-[#1a1a1a] border border-gray-700 shadow-xl" style={{ 
+                <div className="bg-[#fff] border shadow-md" style={{ 
                   width: "370px", 
-                  height: "500px",
+                  height: "600px",
                   maxHeight: "70vh",
                   overflow: "hidden"
                 }}>
                   {/* Advertisement Preview */}
                   <div 
-                    className="w-full h-full relative bg-cover bg-center p-6"
+                    className="relative w-full h-full p-6 bg-center bg-cover"
                     style={{
-                      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${homeImage})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center"
+                      backgroundImage: imagePreview ? 
+                        `url(${imagePreview})` : 
+                        'url("/api/placeholder/800/1200")',
+                      backgroundBlendMode: 'overlay',
+                      backgroundColor: 'rgba(0,0,0,0.5)'
                     }}
                   >
                     <div className="text-center text-white">
-                      <h1 className="text-3xl font-thin mb-3 tracking-widest" style={{
+                      <h1 className="mb-3 text-3xl font-thin tracking-widest" style={{
                         fontFamily: 'Bodoni, serif',
                         textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
                       }}>
-                        {selectedAd.title}
+                        {formData.title}
                       </h1>
 
-                      <div className="max-w-md mx-auto bg-black bg-opacity-60 p-4 rounded-lg">
-                        <p className="text-sm mb-3 leading-relaxed whitespace-pre-wrap">
-                          {selectedAd.description}
+                      <div className="max-w-md p-4 mx-auto bg-black rounded-lg bg-opacity-30">
+                        <p className="mb-3 text-sm leading-relaxed whitespace-pre-wrap">
+                          {formData.description}
                         </p>
                       </div>
 
-                      <div className="absolute bottom-6 left-0 right-0 text-sm bg-black bg-opacity-60 py-3 px-4 rounded-lg">
+                      <div className="absolute left-0 right-0 px-4 py-3 text-sm bg-black rounded-lg bottom-6 bg-opacity-30">
                         <div className="flex items-start mb-2">
-                          <FaDollarSign className="mr-2 mt-1" />
-                          <span><strong>Starting from</strong> {selectedAd.price}</span>
+                          <FaDollarSign className="mt-1 mr-2" />
+                          <span><strong>Starting from</strong> {formData.price}</span>
                         </div>
                         
                         <div className="space-y-1">
-                          <div className="flex items-start ">
-                            <FaMapMarkerAlt className="mr-2 mt-1" />
-                            <span>{selectedAd.location}</span>
+                          <div className="flex items-start">
+                            <FaMapMarkerAlt className="mt-1 mr-2" />
+                            <span>{formData.location}</span>
                           </div>
                           
                           <div className="flex items-start">
-                            <FaPhone className="mr-2 mt-1" />
-                            <span>{selectedAd.contactNumber}</span>
+                            <FaPhone className="mt-1 mr-2" />
+                            <span>{formData.contactNo}</span>
                           </div>
                           
-                          <div className="flex items-start ">
-                            <FaEnvelope className="mr-2 mt-1" />
-                            <span>{selectedAd.email}</span>
+                          <div className="flex items-start">
+                            <FaEnvelope className="mt-1 mr-2" />
+                            <span>{formData.email}</span>
                           </div>
                         </div>
                       </div>
@@ -341,133 +461,148 @@ const AdminDashAdvertisment = () => {
               
               {/* Edit Form on the right */}
               {showEditForm && (
-                <div className="md:w-1/2 p-4 overflow-y-auto max-h-[70vh] bg-gray-800 rounded-lg">
+                <div className="md:w-1/2 p-4 overflow-y-auto max-h-[70vh]">
                   <form className="space-y-4">
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="title" value="Title" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="title" value="Title" />
                       </div>
                       <TextInput
                         id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
                         required
-                        className="bg-gray-700 text-white border-gray-600"
                       />
                     </div>
 
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="description" value="Description" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="description" value="Description" />
                       </div>
                       <Textarea
                         id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
                         required
                         rows={5}
-                        className="bg-white border-gray-600"
-                        // style={{ color: 'white' }}
-                        placeholder="Enter description..."
                       />
                     </div>
 
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="category" value="Category" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="category" value="Category" />
                       </div>
                       <Select
                         id="category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
                         required
-                        className="bg-white border-gray-600"
-                        // style={{ color: 'white' }}
                       >
-                        <option value="" disabled style={{ color: 'black' }}>Select a category</option>
-                        <option value="Venues" style={{ color: 'black' }}>Venues</option>
-                        <option value="Photography" style={{ color: 'black' }}>Photography</option>
-                        <option value="Catering" style={{ color: 'black' }}>Catering</option>
-                        <option value="Decorations" style={{ color: 'black' }}>Decorations</option>
-                        <option value="Entertainment" style={{ color: 'black' }}>Entertainment</option>
-                        <option value="Bridal Wear" style={{ color: 'black' }}>Bridal Wear</option>
-                        <option value="Other" style={{ color: 'black' }}>Other</option>
+                        <option value="" disabled>Select a category</option>
+                        <option value="Venues">Venues</option>
+                        <option value="Photography">Photography</option>
+                        <option value="Catering">Catering</option>
+                        <option value="Decorations">Decorations</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Bridal Wear">Bridal Wear</option>
+                        <option value="Other">Other</option>
                       </Select>
                     </div>
 
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="location" value="Location" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="location" value="Location" />
                       </div>
                       <TextInput
                         id="location"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
                         required
-                        className="bg-white border-gray-600"
-                        // style={{ color: 'white' }}
-                        placeholder="Enter location..."
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
-                        <div className="mb-2 block">
-                          <Label htmlFor="contactNumber" value="Contact Number" className="text-white" />
+                        <div className="block mb-2">
+                          <Label htmlFor="contactNo" value="Contact Number" />
                         </div>
                         <TextInput
-                          id="contactNumber"
-                          value={contactNumber}
-                          onChange={(e) => setContactNumber(e.target.value)}
+                          id="contactNo"
+                          name="contactNo"
+                          value={formData.contactNo}
+                          onChange={handleChange}
                           required
-                          className="bg-white border-gray-600"
-                          // style={{ color: 'white' }}
-                          placeholder="Phone number..."
                         />
                       </div>
 
                       <div>
-                        <div className="mb-2 block">
-                          <Label htmlFor="email" value="Email" className="text-white" />
+                        <div className="block mb-2">
+                          <Label htmlFor="email" value="Email" />
                         </div>
                         <TextInput
                           id="email"
+                          name="email"
                           type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          value={formData.email}
+                          onChange={handleChange}
                           required
-                          className="bg-gray-700 text-white border-gray-600"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="price" value="Price" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="price" value="Price" />
                       </div>
                       <TextInput
                         id="price"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
                         required
-                        className="bg-gray-700 text-white border-gray-600"
                       />
                     </div>
 
                     <div>
-                      <div className="mb-2 block">
-                        <Label htmlFor="image" value="Background Image" className="text-white" />
+                      <div className="block mb-2">
+                        <Label htmlFor="image" value="Background Image" />
                       </div>
                       <FileInput
                         id="image"
                         accept="image/*"
+                        onChange={handleImageChange}
                         helperText="Upload a new background image (optional)"
-                        className="bg-gray-700 text-white border-gray-600"
                       />
                     </div>
+
+                    {imageUploadProgress !== null && (
+                      <div className="flex justify-center">
+                        <div style={{ width: 80, height: 80 }}>
+                          <CircularProgressbar
+                            value={imageUploadProgress || 0}
+                            text={`${imageUploadProgress}%`}
+                            strokeWidth={5}
+                          />
+                        </div>
+                      </div>
+                    )}
                     
-                    <Button className="w-full bg-green-800 hover:bg-green-900" onClick={handleUpdate}>
-                      Save Changes
+                    {imageUploadError && (
+                      <p className="text-red-500 error">
+                        {imageUploadError}
+                      </p>
+                    )}
+                    
+                    <Button 
+                      className="w-full text-white bg-pink-600 hover:bg-pink-800" 
+                      onClick={handleUpdate}
+                      disabled={imageUploading}
+                    >
+                      {imageUploading ? "Uploading..." : "Save Changes"} {!imageUploading && <FaArrowRight className="ml-2" />}
                     </Button>
                   </form>
                 </div>
@@ -475,22 +610,22 @@ const AdminDashAdvertisment = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer className="bg-[#3a1d4d] h-[60px] rounded-b-[10px]">
-          <div className="flex justify-end gap-4 w-full">
+        <Modal.Footer className="bg-[#e8cfee] h-[60px] rounded-b-[10px]">
+          <div className="flex justify-end w-full gap-4">
             {selectedAd && !showEditForm && (
               <>
-                <Button className="bg-green-800 hover:bg-green-900" onClick={() => handleAccept(selectedAd.id)}>
+                <Button className="bg-green-600 hover:bg-green-800" onClick={() => handleAccept(selectedAd.id)}>
                   <FaCheck className="mr-2" /> Accept
                 </Button>
-                <Button className="bg-red-800 hover:bg-red-900" onClick={() => handleReject(selectedAd.id)}>
+                <Button className="bg-red-600 hover:bg-red-800" onClick={() => handleReject(selectedAd.id)}>
                   <FaTimes className="mr-2" /> Reject
                 </Button>
-                <Button className="bg-indigo-800 hover:bg-indigo-900" onClick={toggleEditForm}>
+                <Button className="bg-blue-600 hover:bg-blue-800" onClick={toggleEditForm}>
                   <FaEdit className="mr-2" /> Edit
                 </Button>
               </>
             )}
-            <Button className="bg-gray-700 hover:bg-gray-800" onClick={() => {
+            <Button className="bg-gray-600 hover:bg-gray-800" onClick={() => {
               setViewModalOpen(false);
               setShowEditForm(false);
             }}>

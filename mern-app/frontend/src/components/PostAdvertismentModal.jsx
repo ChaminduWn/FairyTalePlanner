@@ -1,19 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, TextInput, Textarea, Label, FileInput, Select, Toast } from "flowbite-react";
-import { FaArrowRight, FaUpload, FaMapMarkerAlt, FaPhone, FaEnvelope, FaDollarSign, FaExclamationCircle, FaCheckCircle } from "react-icons/fa";
+import { FaArrowRight, FaExclamationCircle, FaCheckCircle } from "react-icons/fa";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase"; // Import Firebase app instance
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
   // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [price, setPrice] = useState("");
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    location: "",
+    contactNo: "",
+    email: "",
+    price: "",
+    image: "",
+  });
+
+  // Image handling states
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUploadProgress, setImageUploadProgress] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   
   // Toast state
   const [showToast, setShowToast] = useState(false);
@@ -25,7 +41,7 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
     title: "",
     description: "",
     email: "",
-    contactNumber: "",
+    contactNo: "",
     price: ""
   });
   
@@ -64,42 +80,31 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
     return priceRegex.test(value) ? "" : "Price should be a positive number";
   };
   
-  // Handle input change with validation
-  const handleTitleChange = (e) => {
-    const value = e.target.value;
-    setTitle(value);
-    setErrors({...errors, title: validateTitle(value)});
+  // Handle form field changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Run validation for the changed field
+    if (name === "title") {
+      setErrors({...errors, title: validateTitle(value)});
+    } else if (name === "description") {
+      setErrors({...errors, description: validateDescription(value)});
+    } else if (name === "email") {
+      setErrors({...errors, email: validateEmail(value)});
+    } else if (name === "contactNo") {
+      setErrors({...errors, contactNo: validatePhone(value)});
+    } else if (name === "price") {
+      setErrors({...errors, price: validatePrice(value)});
+    }
   };
   
-  const handleDescriptionChange = (e) => {
-    const value = e.target.value;
-    setDescription(value);
-    setErrors({...errors, description: validateDescription(value)});
-  };
-  
-  const handleEmailChange = (e) => {
-    const value = e.target.value;
-    setEmail(value);
-    setErrors({...errors, email: validateEmail(value)});
-  };
-  
-  const handleContactNumberChange = (e) => {
-    const value = e.target.value;
-    setContactNumber(value);
-    setErrors({...errors, contactNumber: validatePhone(value)});
-  };
-  
-  const handlePriceChange = (e) => {
-    const value = e.target.value;
-    setPrice(value);
-    setErrors({...errors, price: validatePrice(value)});
-  };
-  
-  // Handle image upload
+  // Handle image file selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setBackgroundImage(file);
+      setImageFile(file);
+      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -107,43 +112,88 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
       reader.readAsDataURL(file);
     }
   };
+  
+  // Upload image to Firebase when the image file changes
+  useEffect(() => {
+    if (imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
+
+  const uploadImage = async () => {
+    setImageUploading(true);
+    setImageUploadError(null);
+    const storage = getStorage(app); // Firebase storage instance
+    const fileName = new Date().getTime() + imageFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageUploadProgress(progress.toFixed(0));
+      },
+      (error) => {
+        setImageUploadError("Error uploading image. Please try again.");
+        setImageUploadProgress(null);
+        setImageUploading(false);
+        displayToast("Error uploading image!", "error");
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setFormData((prev) => ({ ...prev, image: downloadURL }));
+        setImageUploading(false);
+        displayToast("Image uploaded successfully!", "success");
+      }
+    );
+  };
 
   // Handle form submission with validation
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check if image is still uploading
+    if (imageUploading) {
+      displayToast("Please wait until the image is uploaded.");
+      return;
+    }
+    
+    // Check if the image has been uploaded
+    if (!formData.image) {
+      displayToast("Please upload an image");
+      return;
+    }
+    
     // Check if any required field is empty
-    if (!title || !description || !category || !location || !contactNumber || !email || !price) {
+    if (!formData.title || !formData.description || !formData.category || !formData.location || !formData.contactNo || !formData.email || !formData.price) {
       // Set generic error message for empty fields
       setErrors({
-        title: !title ? "Title is required" : validateTitle(title),
-        description: !description ? "Description is required" : validateDescription(description),
-        email: !email ? "Email is required" : validateEmail(email),
-        contactNumber: !contactNumber ? "Contact number is required" : validatePhone(contactNumber),
-        price: !price ? "Price is required" : validatePrice(price)
+        title: !formData.title ? "Title is required" : validateTitle(formData.title),
+        description: !formData.description ? "Description is required" : validateDescription(formData.description),
+        email: !formData.email ? "Email is required" : validateEmail(formData.email),
+        contactNo: !formData.contactNo ? "Contact number is required" : validatePhone(formData.contactNo),
+        price: !formData.price ? "Price is required" : validatePrice(formData.price)
       });
       
-      // Show toast for required fields
-      if (!category || !location) {
-        displayToast("Please fill in all required fields");
-      }
-      
+      displayToast("Please fill in all required fields");
       return;
     }
     
     // Validate all fields before submission
-    const titleError = validateTitle(title);
-    const descriptionError = validateDescription(description);
-    const emailError = validateEmail(email);
-    const phoneError = validatePhone(contactNumber);
-    const priceError = validatePrice(price);
+    const titleError = validateTitle(formData.title);
+    const descriptionError = validateDescription(formData.description);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhone(formData.contactNo);
+    const priceError = validatePrice(formData.price);
     
     // Update all errors
     setErrors({
       title: titleError,
       description: descriptionError,
       email: emailError,
-      contactNumber: phoneError,
+      contactNo: phoneError,
       price: priceError
     });
     
@@ -152,63 +202,50 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
       return;
     }
     
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("category", category);
-    formData.append("location", location);
-    formData.append("contactNo", contactNumber);
-    formData.append("email", email);
-    formData.append("price", price);
-    if (backgroundImage) {
-      formData.append("image", backgroundImage);
-    }
-    
-    // Set loading state
-    setIsLoading(true);
-    
-    // Add actual API call
-    fetch("http://localhost:4000/api/advertisement", {
-      method: "POST",
-      body: formData,
-    })
-    .then(response => {
+    try {
+      const response = await fetch("http://localhost:4000/api/advertisement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
       if (!response.ok) {
-        return response.json().then(data => {
-          throw new Error(data.message || "Failed to create advertisement");
-        });
+        const data = await response.json();
+        throw new Error(data.message || "Failed to create advertisement");
       }
-      return response.json();
-    })
-    .then(data => {
-      setIsLoading(false);
+      
+      const data = await response.json();
       displayToast("Advertisement created successfully!", "success");
       onSubmit?.(data);
       handleClose();
-    })
-    .catch(error => {
-      setIsLoading(false);
+    } catch (error) {
       displayToast(error.message || "Error creating advertisement");
       console.error("Error:", error);
-    });
+    }
   };
 
   // Reset form and close modal
   const handleClose = () => {
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    setLocation("");
-    setContactNumber("");
-    setEmail("");
-    setPrice("");
-    setBackgroundImage(null);
+    setFormData({
+      title: "",
+      description: "",
+      category: "",
+      location: "",
+      contactNo: "",
+      email: "",
+      price: "",
+      image: "",
+    });
+    setImageFile(null);
     setImagePreview(null);
+    setImageUploadProgress(null);
     setErrors({
       title: "",
       description: "",
       email: "",
-      contactNumber: "",
+      contactNo: "",
       price: ""
     });
     onClose?.();
@@ -220,11 +257,11 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
       {showToast && (
         <div className="fixed top-4 right-4 z-[9999]">
           <Toast className="shadow-lg">
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+            <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg shrink-0">
               {toastType === "error" ? (
-                <FaExclamationCircle className="h-5 w-5 text-red-500" />
+                <FaExclamationCircle className="w-5 h-5 text-red-500" />
               ) : (
-                <FaCheckCircle className="h-5 w-5 text-green-500" />
+                <FaCheckCircle className="w-5 h-5 text-green-500" />
               )}
             </div>
             <div className="ml-3 text-sm font-normal">
@@ -240,18 +277,18 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
           Create Advertisement
         </Modal.Header>
         <Modal.Body className="max-h-[76vh] bg-[#d1cfd1]">
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col gap-6 md:flex-row">
             {/* A4 Preview on the left */}
-            <div className="md:w-1/2 p-4 flex items-center justify-center">
+            <div className="flex items-center justify-center p-4 md:w-1/2">
               <div className="bg-[#fff] border shadow-md" style={{ 
                   width: "370px", 
-                  height: "6600px",
+                  height: "600px",
                   maxHeight: "70vh",
                   overflow: "hidden"
                 }}>
                 {/* Advertisement Preview */}
                 <div 
-                  className="w-full h-full relative bg-cover bg-center p-6"
+                  className="relative w-full h-full p-6 bg-center bg-cover"
                   style={{
                     backgroundImage: imagePreview ? 
                       `url(${imagePreview})` : 
@@ -261,29 +298,29 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                   }}
                 >
                   <div className="text-center text-white">
-                    <h1 className="text-3xl font-thin mb-3 tracking-widest" style={{
+                    <h1 className="mb-3 text-3xl font-thin tracking-widest" style={{
                       fontFamily: 'Bodoni, serif',
                       textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
                     }}>
-                      {title || "Advertisement Title"}
+                      {formData.title || "Advertisement Title"}
                     </h1>
 
-                    <div className="max-w-md mx-auto bg-black bg-opacity-30 p-4 rounded-lg">
-                      <p className="text-sm mb-3 leading-relaxed whitespace-pre-wrap">
-                        {description || "Your advertisement description will appear here..."}
+                    <div className="max-w-md p-4 mx-auto bg-black rounded-lg bg-opacity-30">
+                      <p className="mb-3 text-sm leading-relaxed whitespace-pre-wrap">
+                        {formData.description || "Your advertisement description will appear here..."}
                       </p>
                     </div>
 
-                    <div className="absolute bottom-6 left-0 right-0 text-sm bg-black bg-opacity-30 py-3 px-4 rounded-lg">
-                      {price && (
+                    <div className="absolute left-0 right-0 px-4 py-3 text-sm bg-black rounded-lg bottom-6 bg-opacity-30">
+                      {formData.price && (
                         <p className="mb-2">
-                          <strong>Starting from</strong> {price}
+                          <strong>Starting from</strong> {formData.price}
                         </p>
                       )}
                       <div className="space-y-1">
-                        {location && <p>📍 {location}</p>}
-                        {contactNumber && <p>📞 {contactNumber}</p>}
-                        {email && <p>✉️ {email}</p>}
+                        {formData.location && <p>📍 {formData.location}</p>}
+                        {formData.contactNo && <p>📞 {formData.contactNo}</p>}
+                        {formData.email && <p>✉️ {formData.email}</p>}
                       </div>
                     </div>
                   </div>
@@ -295,14 +332,15 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
             <div className="md:w-1/2 p-4 overflow-y-auto max-h-[70vh]">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="title" value="Title (max 6 words)" />
                   </div>
                   <TextInput
                     id="title"
+                    name="title"
                     placeholder="Short and descriptive title"
-                    value={title}
-                    onChange={handleTitleChange}
+                    value={formData.title}
+                    onChange={handleChange}
                     required
                     color={errors.title ? "failure" : undefined}
                     helperText={errors.title}
@@ -310,14 +348,15 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
 
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="description" value="Description (max 100 words)" />
                   </div>
                   <Textarea
                     id="description"
+                    name="description"
                     placeholder="Detailed description of your service"
-                    value={description}
-                    onChange={handleDescriptionChange}
+                    value={formData.description}
+                    onChange={handleChange}
                     required
                     rows={5}
                     color={errors.description ? "failure" : undefined}
@@ -326,13 +365,14 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
 
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="category" value="Category" />
                   </div>
                   <Select
                     id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
                     required
                   >
                     <option value="" disabled>Select a category</option>
@@ -347,48 +387,48 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
 
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="location" value="Location" />
                   </div>
                   <TextInput
                     id="location"
+                    name="location"
                     placeholder="Service location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    value={formData.location}
+                    onChange={handleChange}
                     required
-                    icon={FaMapMarkerAlt}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <div className="mb-2 block">
-                      <Label htmlFor="contactNumber" value="Contact Number (digits only)" />
+                    <div className="block mb-2">
+                      <Label htmlFor="contactNo" value="Contact Number (digits only)" />
                     </div>
                     <TextInput
-                      id="contactNumber"
+                      id="contactNo"
+                      name="contactNo"
                       placeholder="Phone number for inquiries"
-                      value={contactNumber}
-                      onChange={handleContactNumberChange}
+                      value={formData.contactNo}
+                      onChange={handleChange}
                       required
-                      icon={FaPhone}
-                      color={errors.contactNumber ? "failure" : undefined}
-                      helperText={errors.contactNumber}
+                      color={errors.contactNo ? "failure" : undefined}
+                      helperText={errors.contactNo}
                     />
                   </div>
 
                   <div>
-                    <div className="mb-2 block">
+                    <div className="block mb-2">
                       <Label htmlFor="email" value="Email" />
                     </div>
                     <TextInput
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="Email for communication"
-                      value={email}
-                      onChange={handleEmailChange}
+                      value={formData.email}
+                      onChange={handleChange}
                       required
-                      icon={FaEnvelope}
                       color={errors.email ? "failure" : undefined}
                       helperText={errors.email}
                     />
@@ -396,23 +436,23 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
 
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="price" value="Price (positive number)" />
                   </div>
                   <TextInput
                     id="price"
+                    name="price"
                     placeholder="Price of your service"
-                    value={price}
-                    onChange={handlePriceChange}
+                    value={formData.price}
+                    onChange={handleChange}
                     required
-                    icon={FaDollarSign}
                     color={errors.price ? "failure" : undefined}
                     helperText={errors.price}
                   />
                 </div>
 
                 <div>
-                  <div className="mb-2 block">
+                  <div className="block mb-2">
                     <Label htmlFor="image" value="Background Image" />
                   </div>
                   <FileInput
@@ -423,7 +463,25 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
                   />
                 </div>
 
-                <div className="text-sm text-gray-500 mt-2">
+                {imageUploadProgress && (
+                  <div className="flex justify-center">
+                    <div style={{ width: 80, height: 80 }}>
+                      <CircularProgressbar
+                        value={imageUploadProgress || 0}
+                        text={`${imageUploadProgress}%`}
+                        strokeWidth={5}
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {imageUploadError && (
+                  <p className="text-red-500 error">
+                    {imageUploadError}
+                  </p>
+                )}
+
+                <div className="mt-2 text-sm text-gray-500">
                   <p>Preview shows how your advertisement will look in A4 format (210mm × 297mm).</p>
                 </div>
               </form>
@@ -431,13 +489,13 @@ const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
           </div>
         </Modal.Body>
         <Modal.Footer className="bg-[#e8cfee] h-[60px] rounded-b-[10px]">
-          <div className="flex justify-end gap-4 w-full">
+          <div className="flex justify-end w-full gap-4">
             <Button 
               className="text-white bg-pink-600 hover:bg-pink-800" 
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={imageUploading}
             >
-              {isLoading ? "Creating..." : "Create Advertisement"} {!isLoading && <FaArrowRight className="mt-1 ml-2" />}
+              {imageUploading ? "Uploading..." : "Create Advertisement"} {!imageUploading && <FaArrowRight className="ml-2" />}
             </Button>
           </div>
         </Modal.Footer>
