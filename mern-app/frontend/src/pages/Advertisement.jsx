@@ -11,7 +11,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 // Import PostAdvertismentModal or add it to this file
-// import PostAdvertismentModal from "./PostAdvertismentModal";
+import PostAdvertismentModal from "../components/PostAdvertismentModal";
 
 const Advertisement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,63 +181,3 @@ const Advertisement = () => {
 };
 
 export default Advertisement;
-
-// You'll need to implement this component based on your existing code
-// This is a simplified outline of what PostAdvertismentModal might look like
-const PostAdvertismentModal = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    price: "",
-    location: "",
-    contactNo: "",
-    email: "",
-    image: ""
-  });
-  
-  const [imageFile, setImageFile] = useState(null);
-  const [imageUploadProgress, setImageUploadProgress] = useState(null);
-  const [imageUploading, setImageUploading] = useState(false);
-  const [imageUploadError, setImageUploadError] = useState(null);
-  
-  // Upload image to Firebase when the image file changes
-  useEffect(() => {
-    if (imageFile) {
-      uploadImage();
-    }
-  }, [imageFile]);
-  
-  const uploadImage = async () => {
-    // Import the Firebase storage functions here
-    // This should match the implementation in AdminDashAdvertisment.jsx
-    // See AdminDashAdvertisment.jsx for complete implementation details
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      // Check if image is still uploading
-      if (imageUploading) {
-        alert("Please wait until the image is uploaded.");
-        return;
-      }
-      
-      // Submit to backend
-      await axios.post('http://localhost:4000/api/advertisement', formData);
-      
-      // Call the onSubmit callback
-      onSubmit();
-    } catch (err) {
-      console.error("Error creating advertisement:", err);
-      alert("Failed to create advertisement");
-    }
-  };
-  
-  return (
-    <div>
-      {/* Implement your modal UI here */}
-    </div>
-  );
-};
