@@ -8,6 +8,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { SnackbarProvider } from "notistack";
 
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <PersistGate persistor={persistor}>
     <Provider store={store}>

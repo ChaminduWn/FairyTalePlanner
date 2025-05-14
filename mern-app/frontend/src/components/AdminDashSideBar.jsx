@@ -42,11 +42,10 @@ export default function AdminDashSideBar() {
     }
 
     return () => {
-      // Cleanup if necessary (e.g., if you need to abort a request or similar)
+      // Cleanup if necessary
     };
   }, [location.search]);
 
-  // Add signout function
   const handleSignout = async () => {
     try {
       const res = await fetch('/api/employee/signout', {
@@ -93,49 +92,34 @@ export default function AdminDashSideBar() {
             </div>
           </Link>
         )}
-   
-       {currentUser?.role === "Manager" && (
-        <>
-              
-
-              
-        </>
-             )}
-
 
         {currentUser.isAdmin && (
+          <Link to="/admin-dashboard?tab=dashboard-comp">
+            <div
+              className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                activeTab === "dashboard-comp" ? "bg-[#707070]" : ""
+              }`}
+            >
+              <MdDashboard color="#D4D4D4" />
+              <span className="text-[15px] ml-4 text-[#D4D4D4]">Dashboard</span>
+            </div>
+          </Link>
+        )}
+
+        {(currentUser.role === "Manager" || currentUser.isAdmin) && (
           <>
-            <Link to="/admin-dashboard?tab=dashboard-comp">
-              <div
-                className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
-                  activeTab === "dashboard-comp" ? "bg-[#707070]" : ""
-                }`}
-              >
-                <MdDashboard color="#D4D4D4" />
-                <span className="text-[15px] ml-4 text-[#D4D4D4]">Dashboard</span>
-              </div>
-            </Link>
-            {/* <Route path="/payment-manager" element={<PaymentManager />} /> */}
-
-           
-            
-            <Link to="/admin-dashboard?tab=admin-users">
-              <div
-                className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
-                  activeTab === "admin-users" ? "bg-[#707070]" : ""
-                }`}
-               >
-                <HiUsers color="#D4D4D4" />
-                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Users</span>
-              </div>
-              </Link>     
-
-            
-
-
-            
-
-            
+            {currentUser.isAdmin && (
+              <Link to="/admin-dashboard?tab=admin-users">
+                <div
+                  className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                    activeTab === "admin-users" ? "bg-[#707070]" : ""
+                  }`}
+                >
+                  <HiUsers color="#D4D4D4" />
+                  <span className="text-[15px] ml-4 text-[#D4D4D4]">Users</span>
+                </div>
+              </Link>
+            )}
 
             <Link to="/admin-dashboard?tab=Property-service">
               <div
@@ -144,7 +128,7 @@ export default function AdminDashSideBar() {
                 }`}
               >
                 <MdDashboard color="#D4D4D4" />
-                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Service Management </span>
+                <span className="text-[15px] ml-4 text-[#D4D4D4]">Service Management</span>
               </div>
             </Link>
 
@@ -155,7 +139,7 @@ export default function AdminDashSideBar() {
                 }`}
               >
                 <HiPresentationChartBar color="#D4D4D4" />
-                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Advertisment</span>
+                <span className="text-[15px] ml-4 text-[#D4D4D4]">Advertisement</span>
               </div>
             </Link>
 
@@ -166,55 +150,54 @@ export default function AdminDashSideBar() {
                 }`}
               >
                 <HiLocationMarker color="#D4D4D4" />
-                <span className="text-[15px] ml-4 text-[#D4D4D4]"> Add-Locations</span>
+                <span className="text-[15px] ml-4 text-[#D4D4D4]">Add-Locations</span>
               </div>
             </Link>
-            
 
-            {/* Employee Management */}
-            <div
-              className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
-                activeTab === "emp" ? "bg-[#707070]" : ""
-              }`}
-              onClick={() => toggleDropdown("isOpenEmp")}
-            >
-              <HiOutlineUserGroup color="#D4D4D4" />
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[15px] ml-4 text-[#D4D4D4]">Employees</span>
-                <span className="text-sm">
-                  {dropdowns.isOpenEmp ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                </span>
-              </div>
-            </div>
+            {currentUser.isAdmin && (
+              <>
+                <div
+                  className={`p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white ${
+                    activeTab === "emp" ? "bg-[#707070]" : ""
+                  }`}
+                  onClick={() => toggleDropdown("isOpenEmp")}
+                >
+                  <HiOutlineUserGroup color="#D4D4D4" />
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-[15px] ml-4 text-[#D4D4D4]">Employees</span>
+                    <span className="text-sm">
+                      {dropdowns.isOpenEmp ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                    </span>
+                  </div>
+                </div>
 
-            
-            {dropdowns.isOpenEmp && (
-              <div className="text-left text-sm font-light w-4/5 mx-auto text-[#D4D4D4] p-2">
-               
-                <Link to="/admin-dashboard?tab=addemployee">
-                  <h1
-                    className={`cursor-pointer p-2 hover:bg-[#707070] rounded-md mt-1 ${
-                      activeTab === "addemployee" ? "bg-[#707070]" : ""
-                    }`}
-                  >
-                    Add Employees
-                  </h1>
-                </Link>
-                <Link to="/admin-dashboard?tab=admin-managers">
-                  <h1
-                    className={`cursor-pointer p-2 hover:bg-[#707070] rounded-md mt-1 ${
-                      activeTab === "admin-managers" ? "bg-[#707070]" : ""
-                    }`}
-                  >
-                    Managers
-                  </h1>
-                </Link>
-              </div>
+                {dropdowns.isOpenEmp && (
+                  <div className="text-left text-sm font-light w-4/5 mx-auto text-[#D4D4D4] p-2">
+                    <Link to="/admin-dashboard?tab=addemployee">
+                      <h1
+                        className={`cursor-pointer p-2 hover:bg-[#707070] rounded-md mt-1 ${
+                          activeTab === "addemployee" ? "bg-[#707070]" : ""
+                        }`}
+                      >
+                        Add Employees
+                      </h1>
+                    </Link>
+                    <Link to="/admin-dashboard?tab=admin-managers">
+                      <h1
+                        className={`cursor-pointer p-2 hover:bg-[#707070] rounded-md mt-1 ${
+                          activeTab === "admin-managers" ? "bg-[#707070]" : ""
+                        }`}
+                      >
+                        Managers
+                      </h1>
+                    </Link>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
 
-        {/* Add Sign Out Button at the bottom */}
         <div 
           className="p-2.5 my-2 mx-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-[#707070] text-white mt-auto"
           onClick={handleSignout}

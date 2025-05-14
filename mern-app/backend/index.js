@@ -12,20 +12,18 @@ import authEmployeeRoutes from './routes/authEmployee.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 import advertisment from './routes/advertismentRoutes.js';
 import LocationsRoutes, { adminRouter as LocationsAdminRoutes } from './routes/location.routes.js';
-
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+// import propertyServiceRoutes from './routes/propertyServiceRoute.js'; // Added
 
 dotenv.config();
 
-// Define __dirname for ES modules (MOVED UP)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
-// Create uploads directory if it doesn't exist (MOVED UP)
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = path.join(dirname, 'Uploads');
 if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir, { recursive: true });
+    fs.mkdirSync(UploadsDir, { recursive: true });
 }
 
 mongoose
@@ -40,40 +38,30 @@ mongoose
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
-  credentials: true // If you're using cookies
+  origin: 'http://localhost:5173',
+  credentials: true
 }));
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Serve static files from the "uploads" directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(dirname, 'Uploads')));
 
 app.listen(4000, () => {
   console.log('Server is running on port 4000!!');
 });
 
 // Routes
-
 app.use("/api/budget", BudgetRoutes);
-// app.use("/api/location", LocationsRoutes);
+app.use("/api/location", LocationsRoutes);
 app.use("/api/employee", employeeRoutes);  
 app.use("/api/authEmployeeRoutes", authEmployeeRoutes); 
 app.use("/api/advertisement", advertisment);
-
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+// app.use('/api/propertyService', propertyServiceRoutes); // Added
+app.use("/api/admin", LocationsAdminRoutes);
 
-// In index.js, add this line
-
-// Then in your route definitions section:
-app.use("/api/location", LocationsRoutes);
-app.use("/api/admin", LocationsAdminRoutes); // Add this line
-
-
-
-// ✅ FIXED: Global Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -83,5 +71,3 @@ app.use((err, req, res, next) => {
     message
   });
 });
-
-// ✅ Start Server

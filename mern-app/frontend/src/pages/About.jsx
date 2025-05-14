@@ -13,7 +13,7 @@ const AboutPage = () => {
             <div className="absolute inset-0 bg-purple-600 opacity-70"></div>
             <div className="relative z-10 flex items-center justify-center h-full">
               <h1 className="text-5xl font-bold text-center text-white">
-                Dream Wedding Planner
+                Dreams Wedding Planner
               </h1>
             </div>
           </div>
