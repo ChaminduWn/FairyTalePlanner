@@ -9,8 +9,10 @@ import DashboardComponent from "../components/DashboardComponent.jsx";
 import SearchEmployee from "../components/SearchEmployee.jsx"; 
 import AdminDashAdvertisment from "../components/AdminDashAdvertisment.jsx";
 // import LocationMap from "./LocationMap.jsx";
-import ManagementDashboard from "./Management.jsx";
+// import ManagementDashboard from "./Management.jsx";
 import AdminLocationsDashboard from "../components/AdminLocationsDashboard.jsx";
+import AdminPropertyService from "../components/AdminPropertyService.jsx";
+// import AdminPropertyServiceList from "../components/AdminPropertyServiceList.jsx";
 
 
 export default function AdminDashboard() {
@@ -51,7 +53,13 @@ export default function AdminDashboard() {
           {tab === "admin-managers" && <AdminDasManagers />}
           {tab === "advertisement" && <AdminDashAdvertisment />}
           {tab === "admin-Locations" && <AdminLocationsDashboard />}     
-          {tab === "Property-service" && <ManagementDashboard />}       
+          {/* {tab === "Property-service" && <ManagementDashboard />}    */}
+                    {tab === "Property-service" && <AdminPropertyService />}   
+                                        {/* {tab === "Property-servicelist" && <AdminPropertyServiceList />}    */}
+
+                    
+
+    
 
   
 
