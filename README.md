@@ -1,4 +1,4 @@
-🌟 <h1>Dreams - Your Ultimate Wedding Planning Hub</h1> 🌟
+<h1>🌟 Dreams - Your Ultimate Wedding Planning Hub 🌟</h1>
 <br>
 
 ![Screenshot 2025-05-15 005705](https://github.com/user-attachments/assets/0398f998-bf70-4b35-b16e-45bb5e23d2cd)
