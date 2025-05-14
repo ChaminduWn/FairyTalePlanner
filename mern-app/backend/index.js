@@ -14,7 +14,7 @@ import advertisment from './routes/advertismentRoutes.js';
 import LocationsRoutes, { adminRouter as LocationsAdminRoutes } from './routes/location.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
-// import propertyServiceRoutes from './routes/propertyServiceRoute.js'; // Added
+import propertyServiceRoutes from './routes/propertyServiceRoute.js'; // Added
 
 dotenv.config();
 
@@ -59,7 +59,7 @@ app.use("/api/authEmployeeRoutes", authEmployeeRoutes);
 app.use("/api/advertisement", advertisment);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
-// app.use('/api/propertyService', propertyServiceRoutes); // Added
+app.use('/api/propertyService', propertyServiceRoutes); // Added
 app.use("/api/admin", LocationsAdminRoutes);
 
 app.use((err, req, res, next) => {
