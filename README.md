@@ -4,7 +4,7 @@
 ![Screenshot 2025-05-15 005705](https://github.com/user-attachments/assets/0398f998-bf70-4b35-b16e-45bb5e23d2cd)
 
 
-<h3>Welcome to Dreams, a vibrant MERN-powered platform that transforms wedding planning into a magical, stress-free journey! 🎉 Built with MongoDB, Express.js, React, and Node.js, and styled with the sleek Tailwind CSS, Dreams is your one-stop network for all things weddings — from stunning venues to dreamy services like car rentals, bridal styling, and unique gifts. Whether you're a couple planning your big day or a vendor showcasing your services, Dreams makes every moment sparkle! 💍 </h3>
+<b>Welcome to Dreams, a vibrant MERN-powered platform that transforms wedding planning into a magical, stress-free journey! 🎉 Built with MongoDB, Express.js, React, and Node.js, and styled with the sleek Tailwind CSS, Dreams is your one-stop network for all things weddings — from stunning venues to dreamy services like car rentals, bridal styling, and unique gifts. Whether you're a couple planning your big day or a vendor showcasing your services, Dreams makes every moment sparkle! 💍 </b>
 
 
 <h3>✨ What Makes Dreams Special?</h3>
@@ -29,6 +29,7 @@ Color-coded markers make it super easy to spot different types of venues and ser
 
 <h3>Budget Tracker Extraordinaire 💸Our standout feature! Plan your dream wedding without breaking the bank:  </h3>
 <br>
+
 ![Screenshot 2025-05-15 002819](https://github.com/user-attachments/assets/916aca9b-583d-451d-9c54-a7ca35fcab19)
 
 
