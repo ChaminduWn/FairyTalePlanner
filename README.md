@@ -35,17 +35,18 @@ Color-coded markers make it super easy to spot different types of venues and ser
 
 Enter your budget, pick a location (from 25 districts), and select services or properties.  
 Hit Generate to unlock:  
-A Max Price Package for luxury vibes.  
-A Min Price Package for savvy savings.  
-1–2 curated sample packages tailored to your needs.
 
+* A Max Price Package for luxury vibes.  
+* A Min Price Package for savvy savings.  
+* 1–2 curated sample packages tailored to your needs.
 
 Perfect for weddings, pre-shoots, or any love-filled event! 💖
 
-Admin-Approved Quality ✅Every location or service request is carefully reviewed by our admins to ensure top-notch quality.
+<br>
 
-Gorgeous, Responsive Design 📱Thanks to Tailwind CSS, Dreams looks stunning on any device, making planning a breeze wherever you are.
+<b>Admin-Approved Quality ✅Every location or service request is carefully reviewed by our admins to ensure top-notch quality.</b>
 
+<b>Gorgeous, Responsive Design 📱Thanks to Tailwind CSS, Dreams looks stunning on any device, making planning a breeze wherever you are.</b>
 
 <h3>🛠️ Tech Stack</h3>
 
@@ -64,7 +65,7 @@ MongoDB (local or MongoDB Atlas)
 Google Maps API Key  
 Git
 
-Installation
+#Installation
 
 Clone the Repo:
 https://github.com/ChaminduWn/FairyTalePlanner
